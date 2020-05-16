@@ -1,0 +1,53 @@
+package com.Game.Engine.gfx;
+
+import Game.GameManager;
+
+public class ImageTile extends Image {
+
+	private int tileW, tileH;
+	
+	public ImageTile(String path, int tileW, int tileH) {
+		super(path, tileW, tileH);
+		this.tileW = tileW;
+		this.tileH = tileH;
+		
+		if(tileW != GameManager.TS && tileH != GameManager.TS) {
+			resize();
+		}
+	}
+
+	public Image getTileImage(int tileX, int tileY) {
+		int[] p = new int[tileW*tileH];
+		for(int y = 0; y < tileW;y++)
+			for(int x = 0; x < tileH; x++)
+				p[x + y * tileW] = this.getP()[(x + tileX * tileW)+(y+tileY * tileH) * this.getW()];
+		return new Image(p, tileW, tileH);
+		
+	}	
+	
+	public int getTileW() {
+		return tileW;
+	}
+
+	public void setTileW(int tileW) {
+		this.tileW = tileW;
+	}
+
+	public int getTileH() {
+		return tileH;
+	}
+
+	public void setTileH(int tileH) {
+		this.tileH = tileH;
+	}
+	@Override
+	public void resize() {
+		
+		super.resize();
+		
+		double rX = (double) GameManager.TS / (double)tileW;
+		double rY = (double) GameManager.TS / (double) tileH;
+		tileW = (int) ((double) tileW * (double) rX);
+		tileH = (int) ((double) tileH * (double) rY);
+	}
+}
