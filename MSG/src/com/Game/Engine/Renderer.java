@@ -27,10 +27,11 @@ public class Renderer {
 	private int ambientColor = 0xff2b2b2b;
 	private int[] lm;
 	private int[] lb;
-	
+
+	private static boolean[][] newLB;
 	private int zDepth = 0;
 	private boolean processing = false;
-	private int camX, camY;
+	private int camX, camY, camX2, camY2;
 	
 	public Renderer(GameContainer gc) {
 		//конструктор отрисовки
@@ -61,7 +62,6 @@ public class Renderer {
 			zb[i] = 0;
 			lm[i] = ambientColor;
 			lb[i] = ambientColor;
-						
 		}
 	}
 	
@@ -156,11 +156,11 @@ public class Renderer {
 	
 	public void setLightBlock(int x, int y, int value) {
 				
-		if(x < 0|| x >= pixelWidth || y < 0 || y >= pixelHeight) return;
-		
+		if(x < -texureSize|| x >= pixelWidth+texureSize || y < -texureSize || y >= pixelHeight + texureSize) return;
 		
 		if(zb[x + y * pixelWidth] > zDepth) return;
-		lb[x+y*pixelWidth] = value ;
+		
+		lb[x+y*pixelWidth] = value;
 		
 	}
 	
@@ -259,9 +259,9 @@ public class Renderer {
 			return;
 		if(offY < -texureSize) 
 			return;
-		if(offX >= pixelWidth) 
+		if(offX >= pixelWidth+texureSize) 
 			return;
-		if(offY >= pixelHeight) 
+		if(offY >= pixelHeight + texureSize) 
 			return;
 		
 		int newX = 0;
@@ -280,7 +280,7 @@ public class Renderer {
 		for(int y = newY; y < newHeight; y++) {
 			for(int x = newX; x < newWidth; x++) {
 				setPixel((int) (x + offX) ,(int) (y + offY), image.getP()[x + y * image.getW()]);
-				setLightBlock((int) (x + offX) ,(int) (y + offY), image.getLightBlock());
+				setLightBlock((int) (x + offX) , (int) (y + offY), image.getLightBlock());
 			}
 		}
 	}
@@ -301,8 +301,8 @@ public class Renderer {
 		
 		if(offX < -texureSize) return;
 		if(offY < -texureSize) return;
-		if(offX >= pixelWidth) return;
-		if(offY >= pixelHeight) return;
+		if(offX >= pixelWidth+texureSize) return;
+		if(offY >= pixelHeight+texureSize) return;
 		
 		int newX = 0;
 		int newY = 0;
@@ -402,7 +402,6 @@ public class Renderer {
 		
 		int err = dx-dy;
 		int e2;
-		
 		while(true) {
 			int screenX = x0 - l.getRadius() + offX;
 			int screenY = y0 - l.getRadius() + offY;
@@ -416,10 +415,15 @@ public class Renderer {
 				return;
 			}
 			e2 = screenX + screenY*pixelWidth;
-			
+			/*
 			if(e2 < lb.length && e2 >=0)
 				if(lb[e2] == Light.FULL) return;
+			*/
+			int x3 = (screenX+camX2)/texureSize, y3 = (screenY+camY2)/texureSize;
 			
+			if(x3 < newLB.length && x3>=0 && y3<newLB[x3].length && y3>=0)
+				if(newLB[x3][y3]) 
+					return;
 			setLightMap(screenX, screenY, lightColor);
 			
 			if(x0 == x1 && y1 == y0) 
@@ -468,6 +472,7 @@ public class Renderer {
 
 	public void setCamX(int camX) {
 		this.camX = camX;
+		if(camX!=0)camX2=camX;
 	}
 
 
@@ -478,6 +483,11 @@ public class Renderer {
 
 	public void setCamY(int camY) {
 		this.camY = camY;
+		if(camY!=0)camY2=camY;
+	}
+
+	public static void setLighBlockMap(boolean[][] lbMap) {
+		newLB = lbMap;
 	}
 	
 }

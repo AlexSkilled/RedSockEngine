@@ -36,7 +36,7 @@ public class GameContainer implements Runnable {
 		
 		public void start() {
 			window = new Window(this);
-			//window.setBounds((int) (width * scale), (int) (height*scale));
+
 			renderer = new Renderer(this);
 			input = new Input(this);
 			imageBuffer = new ImageBuffer();

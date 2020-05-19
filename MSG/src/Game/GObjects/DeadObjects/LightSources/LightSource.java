@@ -13,6 +13,7 @@ public class LightSource extends GameObject{
 	private float delta = 0.25f;
 	private int maxR, minR;
 	private float diam;
+	private float gamma;
 	public LightSource(int x, int y, int r, int color) {
 		this.tileX = x;
 		this.tileY = y;
@@ -20,6 +21,7 @@ public class LightSource extends GameObject{
 		minR = r-5;
 		light = new Light(r, color);
 		diam = light.getDiameter();
+		gamma = 0;
 	}
 
 	@Override
@@ -34,7 +36,7 @@ public class LightSource extends GameObject{
 	@Override
 	public void render(GameContainer gc, Renderer r) {
 		r.setzDepth(0);
-		r.drawLight(light, tileX*32, tileY*32);
+		r.drawLight(light,(int) (GameManager.TS*(tileX+gamma)),(int) (GameManager.TS*(tileY+gamma)));
 		r.setzDepth(1);
 	}
 	

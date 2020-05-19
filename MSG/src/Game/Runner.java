@@ -32,6 +32,7 @@ public class Runner {
 		
 		gc.setWidth(width);
 		gc.setHeight(height);
+		
 		gc.setScale(scale);
 		
 		try {

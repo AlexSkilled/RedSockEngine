@@ -403,19 +403,21 @@ public class GameManager extends AbstractGame {
 				}
 			}
 		}
-
 		gameObjects.add(new LightSource(12, 12, 100, 0xffffff00));
 		
 		gameObjects.add(new LightSource(11, 30, 100, 0xffffff00));
 		gameObjects.add(new LightSource(7, 30, 100, 0xffffff00));
+
 		gameObjects.add(new LightSource(11, 26, 100, 0xffffff00));
 		gameObjects.add(new LightSource(7, 26, 100, 0xffffff00));
 		
-
-		gameObjects.add(new LightSource(30, 30, 100, 0xffffff00));
-		gameObjects.add(new LightSource(7, 26, 100, 0xffffff00));
-		gameObjects.add(new LightSource(11, 26, 100, 0xffffff00));
-		gameObjects.add(new LightSource(7, 26, 100, 0xffffff00));
+		boolean array[][] = new boolean[levelW][levelH];
+		for(int i = 0; i < levelW; i++)
+			for(int j = 0; j < levelH; j++)
+				array[i][j] = enviromentTexture[collisionMap[i+j*levelW][0]].getLightBlock()==1;
+		System.out.println(array[0][0]);
+		System.out.println(array[1][1]);
+		Renderer.setLighBlockMap(array);
 	}
 	
 	/**
@@ -626,4 +628,5 @@ public class GameManager extends AbstractGame {
 	public float getCameraOffY() {
 		return camera.getOffY();
 	}
+
 }

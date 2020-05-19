@@ -220,7 +220,10 @@ public class WorkingConsole extends Info{
 				else
 					if(ConsoleCommands.valueOf(command[1]).equals(ConsoleCommands.AS))
 						if(ConsoleCommands.valueOf(command[2]).equals(ConsoleCommands.MAIN))
-							gm.saveMap(command[3]+".png", false);
+							if(command.length==4)
+								gm.saveMap(command[3]+".png", false);
+							else
+								gm.saveMap("newMap.png", false);
 				break;
 			default:
 				throwError("********************\n"
