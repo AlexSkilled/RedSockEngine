@@ -11,8 +11,6 @@ public abstract class GameObject extends ProgrammObject{
 	protected int tileX, tileY;
 	protected float offX, offY, speed;
 	
-	
-
 	protected String updateName(String[] a, String newName) {
 		a[0] = newName;
 		return String.join(" ", a);
@@ -96,6 +94,10 @@ public abstract class GameObject extends ProgrammObject{
 	
 	public boolean isCollide(int xF, int yF) {
 		return tileX==xF && tileY==yF;
+	}
+
+	public void refresh() {
+		
 	}
 	
 }

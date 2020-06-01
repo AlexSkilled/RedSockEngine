@@ -84,10 +84,10 @@ public abstract class Enemy extends AliveObject{
 	
 	public void patrolY(GameManager gm, float dt) {
 		
-		if(gm.getCollision(tileX, (int) (posY + GameManager.TS)/GameManager.TS) || 
-		   gm.getCollision(tileX, (int) (posY - 1)/GameManager.TS))
+		if(gm.getCollision(tileX, (int) (posY + GameManager.TS)/GameManager.TS + 1) || 
+		   gm.getCollision(tileX, (int) (posY - GameManager.TS)/GameManager.TS))
 			directionY = !directionY;
-
+		
 		if(directionY)
 			moveW(gm, dt);
 		else

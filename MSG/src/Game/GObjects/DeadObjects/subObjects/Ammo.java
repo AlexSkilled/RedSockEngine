@@ -87,7 +87,6 @@ public class Ammo extends Item{
 
 	@Override
 	public void act(GameManager gm, int tileX, int tileY, int destX, int destY, GameContainer gc, Objects masterTag) {
-		// TODO Auto-generated method stub
 		
 	}
 }

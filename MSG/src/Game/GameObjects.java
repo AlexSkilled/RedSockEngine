@@ -24,6 +24,7 @@ public class GameObjects extends ProgrammObject implements GameObjectsContainer{
 		allObjects.put(Objects.bullet, new ArrayList<GameObject>());
 		allObjects.put(Objects.enemy, new ArrayList<GameObject>());
 		allObjects.put(Objects.player, new ArrayList<GameObject>());
+		allObjects.get(Objects.player).add(null);
 		allObjects.put(Objects.item, new ArrayList<GameObject>());
 		allObjects.put(Objects.entity, new ArrayList<GameObject>());
 		
@@ -48,9 +49,9 @@ public class GameObjects extends ProgrammObject implements GameObjectsContainer{
 	public void render(GameContainer gc, Renderer r){
 		for(Objects key : allObjects.keySet()) {
 			if(!key.equals(Objects.player)) {
-			ArrayList<GameObject> temp = allObjects.get(key);
-			for(GameObject gameObject : temp){
-				gameObject.render(gc, r);
+				ArrayList<GameObject> temp = allObjects.get(key);
+				for(GameObject gameObject : temp){
+					gameObject.render(gc, r);
 			}
 		}
 		}
@@ -62,7 +63,10 @@ public class GameObjects extends ProgrammObject implements GameObjectsContainer{
 	
 	public void add(GameObject object) {
 		try {
-			allObjects.get(object.getTag()).add(object);
+			if(object instanceof Player)
+				allObjects.get(Objects.player).set(0, object);
+			else
+				allObjects.get(object.getTag()).add(object);
 		}catch (NullPointerException e) {
 			allObjects.get(Objects.entity).add(object);
 		}		
@@ -142,7 +146,8 @@ public class GameObjects extends ProgrammObject implements GameObjectsContainer{
 	@Override
 	public void clear() {
 		for(Objects key : allObjects.keySet()) {
-			allObjects.get(key).clear();
+			if(!key.equals(Objects.player))
+				allObjects.get(key).clear();
 		}
 	}
 
@@ -152,8 +157,11 @@ public class GameObjects extends ProgrammObject implements GameObjectsContainer{
 			ArrayList<GameObject> temp = allObjects.get(key);
 			for(int i = 0; i < temp.size(); i++){
 				GameObject go = temp.get(i);
-				go.setPosX(go.getTileX() * GameManager.TS + go.getPosX() % GameManager.TS);
-				go.setPosY(go.getTileY() * GameManager.TS + go.getPosY() % GameManager.TS);
+				if(go != null) {
+					go.setPosX(go.getTileX() * GameManager.TS + go.getPosX() % GameManager.TS);
+					go.setPosY(go.getTileY() * GameManager.TS + go.getPosY() % GameManager.TS);
+					go.refresh();
+				}
 			}
 		}
 	}

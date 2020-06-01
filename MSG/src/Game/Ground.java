@@ -1,17 +1,20 @@
 package Game;
 
+import Game.GObjects.Entity;
 import Game.GObjects.Item;
 import Game.GObjects.ItemCreater;
 
 public class Ground{
 	
 	private Item[] items;
+	private Entity[] entities;
 	private int width, height;
 	
 	public Ground(int levelW, int levelH) {
 		width = levelW;
 		height = levelH;
 		items = new Item[width*height];
+		entities = new Entity[width*height];
 	}
 	
 	/*
@@ -57,7 +60,10 @@ public class Ground{
 		int x = (int) (Float.parseFloat(data[1]) / GameManager.TS);
 		int y = (int) (Float.parseFloat(data[2]) / GameManager.TS);
 		Item item = ItemCreater.create(Integer.parseInt(data[0]), x, y, gm);
-		items[x + y * width] = item;
+		if(item!=null)
+			items[x + y * width] = item;
+		else
+			System.out.println("Error while loading " + String.join(" ", data) + " object");
 	}
 	
 	/*
@@ -87,5 +93,12 @@ public class Ground{
 			gm.addObject(items[x+y*width]);
 		}
 	}
+
+	public void putEntity(Entity entity) {
+		entities[entity.getTileX()+entity.getTileY()*width] = entity;
+	}
 	
+	public void actEntity(int x, int y) {
+		
+	}
 }

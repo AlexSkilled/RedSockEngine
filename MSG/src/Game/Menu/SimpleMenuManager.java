@@ -9,6 +9,7 @@ import java.util.HashMap;
 import com.Game.Engine.GameContainer;
 import com.Game.Engine.Renderer;
 import com.Game.Engine.gfx.buffer.ImageBuffer;
+import com.Game.Enums.Levels;
 import com.Game.Enums.Mod;
 
 import Game.GameManager;
@@ -251,11 +252,12 @@ public class SimpleMenuManager extends ProgrammObject {
 		        File[] listOfFiles = folder.listFiles();
 		        
 		        for(int i = 0; i < listOfFiles.length; i++) {
-		        	tempButton = new ComplexButton(listOfFiles[i].getName().substring(0, listOfFiles[i].getName().length()-5)) {
+		        	tempButton = new ComplexButton(listOfFiles[i].getName()) {
 
 		        		@Override
 		        		public void act(GameManager gm, GameContainer gc, SimpleMenuManager menuManager) {
-		        			Storage.loadSave(name, gm, GameContainer.getMainPath() + "saves/" + getName() + ".save");
+		        			//Storage.loadSave("saves\\" + getName()).split("\n")[0].split(":")[1]
+		        			gm.loadGame("saves\\", getName());
 		        			backUpScene = Menus.PauseMenu;
 							updateScene(Menus.PauseMenu);
 							turnedOn = false;
@@ -267,12 +269,11 @@ public class SimpleMenuManager extends ProgrammObject {
         				tempName = tempButton.getName().substring(0,3);
         			else
         				tempName = tempButton.getName();
-		        	
 		        	tempButton.addSubButton(new SimpleButton("Delete " + tempName + "...", tempButton.getName()) {
         				
         				@Override
 		        		public void act(GameManager gm, GameContainer gc, SimpleMenuManager menuManager) {			        					
-		        			Storage.deleteSave(GameContainer.getMainPath() + "saves/" + getCommand() + ".save");
+		        			Storage.deleteSave(GameContainer.getMainPath() + "saves\\" + getCommand());
         					deleteButton(getCommand());
 		        		}
         			});
@@ -297,42 +298,40 @@ public class SimpleMenuManager extends ProgrammObject {
 				SimpleButton back = paragraphs.get(0);
 				paragraphs.clear();
 				
-				File folder = new File(GameContainer.getMainPath() + "/levels/building/");
+				File folder = new File(GameContainer.getMainPath() + "building/");
 		        if(folder.exists()) {
 			        File[] listOfFiles = folder.listFiles();
 			        ComplexButton tempButton = null;
 			        for(int i = 0; i < listOfFiles.length; i++) {
-			    		if(listOfFiles[i].getName().substring(listOfFiles[i].getName().length()-3).equals("png")) {
-				        	tempButton = new ComplexButton(listOfFiles[i].getName().substring(0, listOfFiles[i].getName().length()-4)) {
-				        		
-				        		@Override
-				        		public void act(GameManager gm, GameContainer gc, SimpleMenuManager menuManager) {
-				        			backUpScene = Menus.PauseMenu;
-									updateScene(Menus.PauseMenu);
-									turnedOn = false;
-				        			gm.loadGameLevel(GameContainer.getMainPath() + "levels/building/" + getName(), Mod.creater);
-				        		}
+			        	tempButton = new ComplexButton(listOfFiles[i].getName()) {
+			        		
+			        		@Override
+			        		public void act(GameManager gm, GameContainer gc, SimpleMenuManager menuManager) {
+			        			backUpScene = Menus.PauseMenu;
+								updateScene(Menus.PauseMenu);
+								turnedOn = false;
+			        			gm.loadGameLevel(Levels.valueOf(getName()), Mod.creater);
+			        		}
 
-				        		@Override
-				    			public void refresh() {
-				        			subButtons.clear();
-				        			String tempName ;
-				        			if(getName().length() >= 3)
-				        				tempName = getName().substring(0,3);
-				        			else
-				        				tempName = getName();
-						        	
-						        	addSubButton(new SimpleButton("Delete " + tempName + "...", getName()){
-				        				@Override
-						        		public void act(GameManager gm, GameContainer gc, SimpleMenuManager menuManager) {
-						        			Storage.deleteSave(GameContainer.getMainPath() + "levels/building/" + getCommand() +".png");
-						        			deleteButton(getCommand());
-						        		}
-				        			});
-				        		}
-				        	};
-				        	addButton(tempButton);
-				        }
+			        		@Override
+			    			public void refresh() {
+			        			subButtons.clear();
+			        			String tempName ;
+			        			if(getName().length() >= 3)
+			        				tempName = getName().substring(0,3);
+			        			else
+			        				tempName = getName();
+					        	
+					        	addSubButton(new SimpleButton("Delete " + tempName + "...", getName()){
+			        				@Override
+					        		public void act(GameManager gm, GameContainer gc, SimpleMenuManager menuManager) {
+					        			Storage.deleteSave(GameContainer.getMainPath() + "building/" + getCommand());
+					        			deleteButton(getCommand());
+					        		}
+			        			});
+			        		}
+			        	};
+			        	addButton(tempButton);
 			        }
 					super.refresh();
 		        }

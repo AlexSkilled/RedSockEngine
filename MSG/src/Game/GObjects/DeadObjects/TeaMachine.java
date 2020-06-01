@@ -5,7 +5,6 @@ import java.util.Date;
 
 import com.Game.Engine.GameContainer;
 import com.Game.Engine.Renderer;
-import com.Game.Engine.gfx.buffer.Images;
 import com.Game.Enums.Objects;
 
 import Game.GameManager;
@@ -26,19 +25,10 @@ public class TeaMachine extends Entity{
 	private boolean said;
 	private CallOut callOut;
 	
-	@Override
-	public String toString() {
-		String line = super.toString();
-		String[] line_ = line.split(" ");
-		line_[0] += " TeaMachine";
-		line = String.join(" ", line_);
-		return line;
-	}
-	
-	public TeaMachine(int posX, int posY, Images image) {
-		super(posX, posY, image);
-		tag = Objects.teaMachine;
+	public TeaMachine(int posX, int posY) {
+		super(20, posX, posY);
 		
+		tag = Objects.teaMachine;
 		mi = new MachineInterface();
 		mi.setOffX(-200);
 		mi.setOffY(40);
@@ -57,7 +47,7 @@ public class TeaMachine extends Entity{
 						if(button instanceof InsertArea)
 							if(!button.getName().equals(""))
 								saveName = button.getName();
-				Storage.createSave(gm, saveName);
+				Storage.updateSave(gm, saveName);
 				gm.continueGame();
 				gc.getInput().turnOffInserting();
 				menuOpened = false;

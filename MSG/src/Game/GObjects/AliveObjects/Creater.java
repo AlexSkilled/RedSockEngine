@@ -121,4 +121,9 @@ public class Creater extends Player{
 			invent.addItem(ItemCreater.create(Integer.parseInt(data[i].split(" ")[0]), gm));
 		}
 	}
+	@Override
+	public String toString() {
+		return "AliveObject Player" + posX + " " + posY + " 100 100 0 player \n" + 
+				"null:null:null:null:null:null:null:null:";
+	}
 }

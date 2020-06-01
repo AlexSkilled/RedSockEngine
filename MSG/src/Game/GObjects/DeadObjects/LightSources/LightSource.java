@@ -5,21 +5,21 @@ import com.Game.Engine.Renderer;
 import com.Game.Engine.gfx.Light;
 
 import Game.GameManager;
-import Game.GameObject;
+import Game.GObjects.Entity;
 
-public class LightSource extends GameObject{
+public class LightSource extends Entity{
 
 	private Light light;
 	private float delta = 0.25f;
 	private int maxR, minR;
 	private float diam;
 	private float gamma;
-	public LightSource(int x, int y, int r, int color) {
-		this.tileX = x;
-		this.tileY = y;
-		maxR = r;
-		minR = r-5;
-		light = new Light(r, color);
+	
+	public LightSource(int tileX, int tileY, float r, int color) {
+		super(25, tileX, tileY);
+		maxR = (int) (r*GameManager.TS);
+		minR = maxR-5;
+		light = new Light(maxR, color);
 		diam = light.getDiameter();
 		gamma = 0;
 	}
@@ -30,7 +30,6 @@ public class LightSource extends GameObject{
 		light.setDiameter((int) diam);
 		if(light.getDiameter() < minR*2 || light.getDiameter() > maxR*2 )
 			delta*=-1;
-			
 	}
 
 	@Override
@@ -39,5 +38,8 @@ public class LightSource extends GameObject{
 		r.drawLight(light,(int) (GameManager.TS*(tileX+gamma)),(int) (GameManager.TS*(tileY+gamma)));
 		r.setzDepth(1);
 	}
-	
+	@Override
+	public String toString() {
+		return (super.toString() + " "+ (float) (maxR/GameManager.TS) + " " + Integer.toHexString(light.getColor()));
+	}
 }

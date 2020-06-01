@@ -166,11 +166,9 @@ public class AliveObject extends GameObject{
 	protected void checkPos(GameManager gm, Ground ground) {
 		Item go = ground.getItem(tileX, tileY);
 		if(go != null) {
-			
 			invent.equip(go);
 			ground.deleteObject(tileX, tileY, gm);
 		}
-		
 	}
 	
 	

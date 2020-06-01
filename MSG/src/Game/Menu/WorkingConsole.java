@@ -161,7 +161,7 @@ public class WorkingConsole extends Info{
 					line = saveNameS[1] + saveNameS[2] 
 							+ "_" + saveNameS[3].split(":")[0] + "_" + saveNameS[3].split(":")[1];
 				}
-				Storage.createSave(gm, line);
+				Storage.updateSave(gm, line);
 				break;
 				
 			case CREATE:
@@ -209,22 +209,11 @@ public class WorkingConsole extends Info{
 					throwError("SPEED SPEED_AMOUNT");
 				break;
 			case SAVEMAP:
-				if(command.length > 1)
-					gm.saveMap(command[1], true);
-				else
-					gm.saveMap(null, true);
+					gm.saveMap();
 				break;
 			case OVERRIDEMAP:
-				if(command.length < 2)
-					gm.saveMap(gm.getLevel(), true);
-				else
-					if(ConsoleCommands.valueOf(command[1]).equals(ConsoleCommands.AS))
-						if(ConsoleCommands.valueOf(command[2]).equals(ConsoleCommands.MAIN))
-							if(command.length==4)
-								gm.saveMap(command[3]+".png", false);
-							else
-								gm.saveMap("newMap.png", false);
-				break;
+					gm.saveMap();
+					break;
 			default:
 				throwError("********************\n"
 					+ "No such command"
@@ -234,8 +223,10 @@ public class WorkingConsole extends Info{
 		
 		}catch (IllegalArgumentException e) {
 			throwError("********************\n"
-						+ "No such command"
+						+ "No such command_error"
 					+ "\n------------------------");
+			e.printStackTrace();
+			
 		}
 	}
 	

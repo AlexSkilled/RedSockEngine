@@ -2,54 +2,32 @@ package Game.GObjects;
 
 import com.Game.Engine.GameContainer;
 import com.Game.Engine.Renderer;
-import com.Game.Engine.gfx.Image;
-import com.Game.Engine.gfx.ImageTile;
-import com.Game.Engine.gfx.buffer.ImageBuffer;
-import com.Game.Engine.gfx.buffer.Images;
 import com.Game.Enums.Objects;
 
 import Game.GameManager;
-import Game.GameObject;
 
-public abstract class Item extends GameObject {
+public abstract class Item extends Entity {
 	
 	protected boolean inPocket = true;
-	protected Image image;
-	protected int ID;
 	
 	public Item(int itemID) {
-		ID = itemID;
+		super(itemID);
 		this.tag = Objects.item;
-		loadImage();
 	}
 	
 	public Item(int itemID, int tileX, int tileY) {
-		ID = itemID;
-		this.posX = tileX * GameManager.TS;
-		this.posY = tileY * GameManager.TS;
+		super(itemID, tileX, tileY);
 		this.tag = Objects.item;
 		this.inPocket = false;		
-		loadImage();
-	}
-	
-	private void loadImage() {
-		if(ID < 100)
-			image = (Image) ((ImageTile) ImageBuffer.load(Images.Items)).getTileImage(ID % 10, ID / 10);
-		else {
-			int x = ID % GameManager.getESX();
-			int y = (ID - x - 100) / GameManager.getESX();
-			image = (Image) ((ImageTile) ImageBuffer.load(Images.enviroment)).getTileImage(x, y);
-			image.downgrade(0.9, 0.9);
-		}
 	}
 	
 	@Override
 	public String toString() {
 		String line = "";
 		if(inPocket)
-			line = "Item " + Integer.toString(ID);
+			line = "Item " + ID;
 		else
-			line = "Item " + Integer.toString(ID)+ " " + posX + " " + posY;
+			line = "Item " + ID + " " + tileX + " " + tileY;
 		return line;
 	}
 	
