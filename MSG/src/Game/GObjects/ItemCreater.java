@@ -65,9 +65,12 @@ public class ItemCreater {
 			if(iD<20)
 				item = new Ammo(iD, x, y);
 				
-		if(item!=null)
+		if(item!=null) {
+			item.setInPocket(false);
 			gm.addObjectToBegin(item);
+		}
 		return item;
+
 	}
 
 	public static Item create(int iD, GameManager gm) {

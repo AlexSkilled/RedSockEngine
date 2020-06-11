@@ -25,11 +25,6 @@ public class SimpleSecondMenu extends SimpleMenu{
 	
 	public void update(GameContainer gc, GameManager gm, SimpleMenuManager menuManager) {
 		super.update(gc, gm, menuManager);
-
-		
-		if(gc.getInput().isKeyUp(KeyEvent.VK_BACK_SPACE)) {
-			paragraphs.get(0).act(gm, gc, menuManager);
-		}
 		
 		if(gc.getInput().isKeyUp(KeyEvent.VK_D) || gc.getInput().isKeyUp(KeyEvent.VK_RIGHT)) {
 			leftSide = false;

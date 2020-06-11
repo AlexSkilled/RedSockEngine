@@ -7,5 +7,6 @@ public enum ConsoleCommands {
 	SPEED,
 	SAVEMAP,
 	OVERRIDEMAP,
-	MAIN, AS
+	MAIN, AS,
+	CAMERA
 }

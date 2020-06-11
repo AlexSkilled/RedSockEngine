@@ -14,7 +14,9 @@ import com.Game.Enums.Mod;
 
 import Game.GameManager;
 import Game.ProgrammObject;
+import Game.Menu.SympleTypes.ChooseArea;
 import Game.Menu.SympleTypes.ComplexButton;
+import Game.Menu.SympleTypes.InsertArea;
 import Game.Menu.SympleTypes.SimpleButton;
 import Game.Menu.SympleTypes.SimpleFirstMenu;
 import Game.Menu.SympleTypes.SimpleMenu;
@@ -294,16 +296,23 @@ public class SimpleMenuManager extends ProgrammObject {
 			
 			@Override
 			public void refresh() {
+				
 				super.refresh();
 				SimpleButton back = paragraphs.get(0);
 				paragraphs.clear();
-				
+
+		        ComplexButton tempButton = null;
+		        
 				File folder = new File(GameContainer.getMainPath() + "building/");
 		        if(folder.exists()) {
 			        File[] listOfFiles = folder.listFiles();
-			        ComplexButton tempButton = null;
+			        tempButton = null;
 			        for(int i = 0; i < listOfFiles.length; i++) {
-			        	tempButton = new ComplexButton(listOfFiles[i].getName()) {
+			        	String btnName = listOfFiles[i].getName();
+			        	if(!btnName.substring(btnName.length()-5).equals(".save"))
+			        		continue;
+			        	btnName = btnName.substring(0, btnName.length()-5);
+			        	tempButton = new ComplexButton(btnName) {
 			        		
 			        		@Override
 			        		public void act(GameManager gm, GameContainer gc, SimpleMenuManager menuManager) {
@@ -335,12 +344,34 @@ public class SimpleMenuManager extends ProgrammObject {
 			        }
 					super.refresh();
 		        }
+		        
+		        tempButton = new ComplexButton("Create new world"){
 
+	        		@Override
+	        		public void act(GameManager gm, GameContainer gc, SimpleMenuManager menuManager) {
+	        			String[] array = subButtons.get(1).getName().split("X");
+	        			try {
+		        			gm.createEmptyWorld(Integer.parseInt(array[0]), Integer.parseInt(array[1]), 
+		        					Levels.valueOf(subButtons.get(0).getName()));
+	        			}catch(NumberFormatException e) {
+	        				e.printStackTrace();	
+	        			}
+	        		}
+
+	        		@Override
+	    			public void refresh() {
+	        			
+	        		}
+		        };
+		        tempButton.addSubButton(new ChooseArea());
+		        tempButton.addSubButton(new InsertArea(0xffa2a2a2, 0xff0000ff));
+		        addButton(tempButton);
 				addButton(back);
 		    }
 		};
 		
 		menus.put(Menus.WorldCreater, tempMenu);
+		
 		/*END*/
 		backUpScene = Menus.MainMenu;
 		activeScene = menus.get(Menus.MainMenu);

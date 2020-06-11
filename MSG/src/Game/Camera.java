@@ -6,10 +6,10 @@ import com.Game.Enums.Objects;
 
 public class Camera {
 	
-	private float offX, offY;
+	protected float offX, offY;
 	
-	private Objects targetTag;
-	private GameObject target = null;
+	protected Objects targetTag;
+	protected GameObject target = null;
 	
 	public Camera(Objects tag) {
 		this.targetTag = tag;
@@ -30,12 +30,18 @@ public class Camera {
 		offX -= dt * (offX - targetX) * 10;
 		offY -= dt * (offY - targetY) * 10;
 		
-		if(offX < 0) offX = 0;
-		if(offY < 0) offY = 0;
-		if(offX + GameContainer.getWidth() > gm.getLevelW()*GameManager.TS) offX = gm.getLevelW() * GameManager.TS
-				- GameContainer.getWidth();
-		if(offY + GameContainer.getHeight() > gm.getLevelH()*GameManager.TS) offY = gm.getLevelH() * GameManager.TS
-				- GameContainer.getHeight();
+		if(offX < 0)
+			offX = 0;
+		else
+			if(offX + GameContainer.getWidth() > gm.getLevelW()*GameManager.TS) 
+				offX = gm.getLevelW() * GameManager.TS - GameContainer.getWidth();
+		
+		if(offY < 0)
+			offY = 0;
+		else
+			
+			if(offY + GameContainer.getHeight() > gm.getLevelH()*GameManager.TS) 
+				offY = gm.getLevelH() * GameManager.TS - GameContainer.getHeight();
 		
 	}
 	

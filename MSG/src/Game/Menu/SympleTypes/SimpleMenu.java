@@ -192,7 +192,6 @@ public abstract class SimpleMenu{
 	}
 	
 	protected void setupButtonLocation(SimpleButton simpleButton, int number, int offX, int offY){
-
 		
 		simpleButton.setRelativeX((35 * GameContainer.getWidth()/96) + cameraOffX + offX);
 		simpleButton.setRelativeY(((1 + number) * GameContainer.getHeight()/ 6) + cameraOffY + offY);

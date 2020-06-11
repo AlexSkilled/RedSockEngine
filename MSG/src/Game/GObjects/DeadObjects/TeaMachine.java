@@ -47,7 +47,7 @@ public class TeaMachine extends Entity{
 						if(button instanceof InsertArea)
 							if(!button.getName().equals(""))
 								saveName = button.getName();
-				Storage.updateSave(gm, saveName);
+				Storage.updateSave(saveName, gm);
 				gm.continueGame();
 				gc.getInput().turnOffInserting();
 				menuOpened = false;

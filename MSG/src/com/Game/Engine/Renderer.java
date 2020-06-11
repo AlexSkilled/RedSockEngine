@@ -376,10 +376,9 @@ public class Renderer {
 	}
 
 	public void drawLight(Light l, int offX, int offY) {
-		offX -= camX;
-		offY -= camY;
+		offX -= camX2;
+		offY -= camY2;
 		lightRequest.add(new LightRequest(l, offX, offY));
-		
 	}
 	
 	private void drawLightRequest(Light l, int offX, int offY) {
@@ -415,10 +414,7 @@ public class Renderer {
 				return;
 			}
 			e2 = screenX + screenY*pixelWidth;
-			/*
-			if(e2 < lb.length && e2 >=0)
-				if(lb[e2] == Light.FULL) return;
-			*/
+
 			int x3 = (screenX+camX2)/texureSize, y3 = (screenY+camY2)/texureSize;
 			
 			if(x3 < newLB.length && x3>=0 && y3<newLB[x3].length && y3>=0)
@@ -471,23 +467,33 @@ public class Renderer {
 
 
 	public void setCamX(int camX) {
+		if(camX>0 || this.camX==0) camX2=camX;
 		this.camX = camX;
-		if(camX!=0)camX2=camX;
 	}
-
 
 	public int getCamY() {
 		return camY;
 	}
 
-
 	public void setCamY(int camY) {
+		if(camY>0 || this.camY==0) camY2=camY;
 		this.camY = camY;
-		if(camY!=0)camY2=camY;
 	}
 
 	public static void setLighBlockMap(boolean[][] lbMap) {
 		newLB = lbMap;
+	}
+
+	public Font getFont() {
+		return font;
+	}
+
+	public static void updateCollisionMap(int x, int y, boolean value) {
+		try {
+			newLB[x][y] = value;
+		}catch (ArrayIndexOutOfBoundsException e) {
+			
+		}
 	}
 	
 }

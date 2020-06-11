@@ -13,6 +13,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
 import com.Game.Engine.GameContainer;
+import com.Game.Enums.CameraStates;
 
 import Game.GameManager;
 
@@ -25,16 +26,16 @@ public class Storage{
 		
 		path = GameContainer.getMainPath() + "saves/" + name;
 		try {
-			copyFolder(new File(GameContainer.getMainPath()+"levels"), new File(path));
+			copyFolder(new File(GameContainer.getMainPath()+"levels"), new File(path), "png ".split(" "));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
 	}
 
-	public static String loadSave(String path) {
+	public static String loadMap(String name){
 		try{
-			path = GameContainer.getMainPath() + path + "\\main.save";
+			String path = GameContainer.getMainPath() + GameManager.getDirectory() + name + ".save";
 			
 			@SuppressWarnings({ "resource" })
 			BufferedReader br = new BufferedReader(new FileReader(path));
@@ -49,10 +50,13 @@ public class Storage{
 			}
 			
 			return data;
+		}catch(FileNotFoundException e2){
+			e2.printStackTrace();
+			return null;
 		}catch (IOException e) {
 			e.printStackTrace();
-			return "";
-		}	
+			return null;
+		}
 	}
 	
 	public static void saveLevel(String data, String path) {
@@ -68,29 +72,82 @@ public class Storage{
 		}
 	}
 	
-	public static void updateSave(GameManager gm, String name){
+	public static void updateSave(String name, GameManager gm){
 		 try {
 			 
-				String path = GameContainer.getMainPath() + gm.getDirectory() + "\\" + name;
+				String path = GameContainer.getMainPath() + GameManager.getDirectory() + name;
+				File newF = new File(path);
 				
-				if(!name.equals(gm.getCurrentSaveName())) {
-					
-					String old = gm.getCurrentGameSaveFile();
-					File newF = new File(path);
-					
-					copyFolder(new File(old), newF);
-					
-					deleteSave(old);
-					
-					gm.setCurrentSaveName(name);
-					path = gm.getCurrentGameSaveFile();
-				}
+				if(newF.isDirectory())
+					if(!name.equals(gm.getCurrentSaveName())) {
+						
+						String old = gm.getCurrentGameSaveFile();
+						
+						copyFolder(new File(old), newF, null);
+						
+						deleteSave(old);
+						
+						gm.setCurrentSaveName(name);
+						path = gm.getCurrentGameSaveFile();
+					}
 
-				String save = "LevelName:" + gm.getLevel() + "\n";
+				String save = "LevelName:" + gm.getLevel() + "\n" + gm.getAllObjects().toString();
+
 				
-				saveLevel(save+gm.getAllObjects().toString() + "\n", path + "\\" + gm.getLevel() + "\\main.save");
+				path += ".save";
+				PrintWriter pw = new PrintWriter(path, "UTF-8");
+				pw.print(save);
+				pw.close();
 				
-				path += "/main.save";
+			}catch (FileNotFoundException e){
+				
+			}catch (IOException e) {
+				System.out.println(e);
+				System.out.println("Ошибка записи файла");
+			}
+		}
+	
+	
+	
+	public static void updateSaveWithCamera(String name, GameManager gm){
+		 try {
+			 
+				String path = GameContainer.getMainPath() + GameManager.getDirectory() + name;
+				File newF = new File(path);
+				
+				if(newF.isDirectory())
+					if(!name.equals(gm.getCurrentSaveName())) {
+						
+						String old = gm.getCurrentGameSaveFile();
+						
+						copyFolder(new File(old), newF, null);
+						
+						deleteSave(old);
+						
+						gm.setCurrentSaveName(name);
+						path = gm.getCurrentGameSaveFile();
+					}
+
+				String save = "LevelName:" + gm.getLevel() + "\n" + gm.getAllObjects().toString();
+
+				boolean xLess = gm.getLevelW()*GameManager.TS<GameContainer.getWidth();
+				boolean yLess = gm.getLevelH()*GameManager.TS<GameContainer.getHeight();
+				
+				if(xLess || yLess) {
+					int camX, camY;
+					camX =- (GameContainer.getWidth()/3 - gm.getLevelW()/2);
+					camY =- (GameContainer.getHeight()/3 - gm.getLevelH()/2);
+					String type;
+					if(xLess && !yLess)
+						type=""+CameraStates.XFIXED;
+					else if(!xLess && yLess)
+						type=""+CameraStates.YFIXED;
+					else
+						type=""+CameraStates.FULLFIXED;
+					save+="Camera " + type + " " + camX + " " + camY + "\n";
+				}
+				
+				path += ".save";
 				PrintWriter pw = new PrintWriter(path, "UTF-8");
 				pw.print(save);
 				pw.close();
@@ -125,9 +182,15 @@ public class Storage{
        
 	}
 
-    public static void copyFolder(File src, File dest)
+    public static void copyFolder(File src, File dest, String[] exceptions)
     	throws IOException{
-
+    	int amountOfExceptions;
+    	
+    	if(exceptions == null)
+    		amountOfExceptions =- 1;
+    	else
+    		amountOfExceptions = exceptions.length;
+    	
     	if(src.isDirectory()){
 
     		//if directory not exists, create it
@@ -138,13 +201,23 @@ public class Storage{
 
     		//list all the directory contents
     		String files[] = src.list();
-
+    		String extension;
+    		outer:
     		for (String file : files) {
+    			if(new File(src+"\\"+file).isFile()) {
+    				extension = file.split("\\.")[1];
+	    			for(int i = 0; i < amountOfExceptions; i++) {
+		    			if(extension.equals(exceptions[i])) {
+		    				continue outer;
+		    			}
+	    			}
+	    		}
+
     		   //construct the src and dest file structure
     		   File srcFile = new File(src, file);
     		   File destFile = new File(dest, file);
     		   //recursive copy
-    		   copyFolder(srcFile,destFile);
+    		   copyFolder(srcFile, destFile, exceptions);
     		}
 
     	}else{

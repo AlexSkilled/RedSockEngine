@@ -16,6 +16,7 @@ public class ComplexButton extends SimpleButton{
 		subButtons = new ArrayList<SimpleButton>();
 
 	}
+	
 	public void update(int mouseX, int mouseY, boolean mouseManaging, GameContainer gc, GameManager gm) {
 		super.update(mouseX, mouseY, mouseManaging, gc, gm);
 		

@@ -4,7 +4,6 @@ public class Font {
 	
 	public static final Font STANDART = new Font("Fonts/standard2.png");
 	
-	
 	private GFX fontImage;
 	private int[] offsets;
 	private int[] widths;
@@ -32,6 +31,16 @@ public class Font {
 		return fontImage;
 	}
 
+	public int getWorldLength(String text) {
+		int offSet = 0;
+		int unicode;
+		for(int i = 0; i < text.length();i++) {
+			unicode = text.codePointAt(i);
+			offSet += widths[unicode];
+		}
+		return offSet;
+	}
+	
 	public void setFontImage(GFX fontImage) {
 		this.fontImage = fontImage;
 	}

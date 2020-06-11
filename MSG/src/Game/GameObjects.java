@@ -36,11 +36,11 @@ public class GameObjects extends ProgrammObject implements GameObjectsContainer{
 		for(Objects key : allObjects.keySet()){
 			temp = allObjects.get(key);
 			for(int i = 0; i < temp.size(); i++){
-				temp.get(i).update(gc, gm, dt);
 				if(temp.get(i).isDead()) {
 					temp.remove(temp.get(i));
 					i--;
 				}
+				temp.get(i).update(gc, gm, dt);
 			}
 		}
 	}

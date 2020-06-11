@@ -57,8 +57,9 @@ public class Ground{
 	 * method drops items from .save files on ground
 	 */
 	public void putOnGround(String[] data, GameManager gm) {
-		int x = (int) (Float.parseFloat(data[1]) / GameManager.TS);
-		int y = (int) (Float.parseFloat(data[2]) / GameManager.TS);
+		int x = (int) (Float.parseFloat(data[1]));
+		int y = (int) (Float.parseFloat(data[2]));
+		
 		Item item = ItemCreater.create(Integer.parseInt(data[0]), x, y, gm);
 		if(item!=null)
 			items[x + y * width] = item;
@@ -85,13 +86,16 @@ public class Ground{
 	}
 
 	public void drop(Item item, int x, int y, GameManager gm) {
+
+		item.setInPocket(false);
+		item.setTileX(x);
+		item.setTileY(y);
+		
 		if(items[x+y*width] == null) {
-			item.setInPocket(false);
-			item.setTileX(x);
-			item.setTileY(y);
 			items[x+y*width] = item;
-			gm.addObject(items[x+y*width]);
 		}
+
+		gm.addObject(item);
 	}
 
 	public void putEntity(Entity entity) {

@@ -2,6 +2,7 @@ package Game;
 
 import java.awt.event.KeyEvent;
 import java.util.Date;
+import java.util.HashMap;
 
 import com.Game.Engine.AbstractGame;
 import com.Game.Engine.GameContainer;
@@ -13,6 +14,7 @@ import com.Game.Engine.gfx.ImageTile;
 import com.Game.Engine.gfx.Light;
 import com.Game.Engine.gfx.buffer.ImageBuffer;
 import com.Game.Engine.gfx.buffer.Images;
+import com.Game.Enums.CameraStates;
 import com.Game.Enums.Levels;
 import com.Game.Enums.Mod;
 import com.Game.Enums.Objects;
@@ -30,7 +32,6 @@ import Game.Menu.Info;
 import Game.Menu.InfoBar;
 import Game.Menu.SimpleMenuManager;
 import Game.Menu.WorkingConsole;
-import Game.Saves.CreativeSave;
 import Game.Saves.ImageStorage;
 import Game.Saves.Storage;
 
@@ -43,8 +44,12 @@ public class GameManager extends AbstractGame {
 		
 	private GameObjects gameObjects;
 	
+	private HashMap<Levels, GameObjects> subLevels;
+	
+	private CameraStates defaultCameraState = CameraStates.FOLLOWING;
 	private Levels levelName;
-	private String currentSaveName, directory;
+	private String currentSaveName = "";
+	private static String directory;
 	
 	private SimpleMenuManager menuManager;
 	private boolean draw;
@@ -55,7 +60,7 @@ public class GameManager extends AbstractGame {
 	private short[][] collisionMap;
 	private Image[] enviromentTexture;
 	
-	private static Integer envDeltaX, envDeltaY, collisionStop;;
+	private static Integer envDeltaX, envDeltaY, collisionStop;
 	
 	private int levelW, levelH;
 	
@@ -145,50 +150,52 @@ public class GameManager extends AbstractGame {
 	}
 	
 	public void startNewGame() {
-		curObj = gameObjects;
-		
-		menuManager.setTurnedOn(false);
-		
-		this.levelName = Levels.city_backs_1;
-		gameObjects.clear();
-		
-		camera = new Camera(Objects.player);
 		
 		currentSaveName = (new Date()).toString();
 		String[] saveNameS = currentSaveName.split(" ");
 		
 		currentSaveName = saveNameS[1] + saveNameS[2] 
-				+ "_" + saveNameS[3].split(":")[0] + "_" + saveNameS[3].split(":")[1];
+				+ "_" + saveNameS[3].split(":")[0] + "_" + saveNameS[3].split(":")[1] + "\\";
 
 		directory = "saves\\";
-		
+
 		loadGame();
 		
-		gameStarted = true;
 	}
 	
 	public void loadGame() {
 		Storage.createSave(currentSaveName, this);
-		loadGame(Storage.loadSave(directory+currentSaveName));
+		loadGame(Storage.loadMap(currentSaveName+"main"));
 	}
 	
 	public void loadGame(String directory, String currentSaveName) {
-		this.currentSaveName = currentSaveName;
-		this.directory = directory;
-		loadGame(Storage.loadSave(directory+currentSaveName));
+		GameManager.directory = directory;
+		this.currentSaveName = currentSaveName + "\\";
+		loadGame(Storage.loadMap(this.currentSaveName+"main"));
 	}
 	
 	private void loadGame(String data){
-		String[] info = data.split("\n");
-		this.levelName = Levels.valueOf(info[0].split(":")[1]); //loading name of the current level
-		loadGameObjects(Storage.loadSave(directory + currentSaveName + "\\" + levelName + "\\"));
-	}
-	
-	private void loadGameObjects(String data) {
+		menuManager.setTurnedOn(false);
 		
 		String[] info = data.split("\n");
+		
+		this.levelName = Levels.valueOf(info[0].split(":")[1]); //loading name of the current level
+
+		gameObjects.clear();
+		gameObjects = loadGameObjects(Storage.loadMap(currentSaveName + levelName), true);
+		curObj = gameObjects;
+		if(camera == null)
+			camera = new Camera(Objects.player);
+		gameStarted = true;
+	}
+	
+	private GameObjects loadGameObjects(String data, boolean loadSubLevels) {
+		GameObjects gameObjects = new GameObjects();
+		subLevels = new HashMap<Levels, GameObjects>();
+		String[] info = data.split("\n");
+
 		//loading background and setting wall collision
-		loadLevel(GameContainer.getMainPath() + directory + currentSaveName + "\\" + levelName + "\\" + levelName, false);	
+		loadLevel();	
 		
 		gameObjects.clear();
 		String[] currObject;
@@ -238,8 +245,16 @@ public class GameManager extends AbstractGame {
 						break;
 					case "21":
 						currObject = deleteFirst(currObject);
+						Levels levelName = Levels.valueOf(currObject[2]);
 						entity = new Door((int) Float.parseFloat(currObject[0]),
-								(int) Float.parseFloat(currObject[1]), Levels.valueOf(currObject[2]));
+								(int) Float.parseFloat(currObject[1]), levelName, 
+								Integer.parseInt(currObject[3]), Integer.parseInt(currObject[4]));
+						if(loadSubLevels) {
+							String pat = Storage.loadMap(currentSaveName + levelName); 
+							if(pat != null)
+								subLevels.put(levelName,
+										loadGameObjects(pat, false));
+							}
 						break;
 					case "25":
 						currObject = deleteFirst(currObject);
@@ -262,16 +277,16 @@ public class GameManager extends AbstractGame {
 				currObject = deleteFirst(currObject);
 				playGround.putOnGround(currObject, this);
 				break;
+			case "Camera":
+				currObject = deleteFirst(currObject);
+				fixiseCamera(CameraStates.valueOf(currObject[0]));
+				camera.setOffX(Float.valueOf(currObject[1]));
+				camera.setOffY(Float.valueOf(currObject[2]));
+				break;
 			}
 		}
 		
-		curObj = gameObjects;
-		
-		menuManager.setTurnedOn(false);
-
-		camera = new Camera(Objects.player);
-		
-		gameStarted = true;
+		return gameObjects;
 	}
 	
 	
@@ -283,15 +298,15 @@ public class GameManager extends AbstractGame {
  	}
 	
 	public void loadGameLevel(Levels levelName, Mod mod) {
-		curObj = null;
-		gameObjects.clear();
 		
 		this.levelName = levelName;
-		this.currentSaveName = "";
 		
 		if(mod.equals(Mod.creater))
 			directory = "building\\";
-		loadGameObjects(Storage.loadSave(directory + levelName.toString() + "\\"));
+		
+		curObj = null;
+		gameObjects.clear();
+		gameObjects = loadGameObjects(Storage.loadMap(currentSaveName+levelName.toString()), false);
 		
 		int x = getPlayer().getTileX();
 		int y = getPlayer().getTileY();
@@ -310,8 +325,8 @@ public class GameManager extends AbstractGame {
 			gameObjects.add(new Creater(x, y, this));
 			break;
 		}
-		
-		camera = new Camera(Objects.player);
+		if(camera == null)
+			camera = new Camera(Objects.player);
 		
 		menuManager.setTurnedOn(false);
 		
@@ -361,28 +376,17 @@ public class GameManager extends AbstractGame {
 	 * @return
 	 * returns nothing it's the void function you idiot
 	 */
-	private void loadLevel(String path, boolean loadStuff) {
+	private void loadLevel() {
 		
-		//String path = GameContainer.getMainPath() + "levels\\" + levName;
-		ImageTile tempImage = (ImageTile) ImageBuffer.load(Images.enviroment);
-		
-		envDeltaX = tempImage.getW()/tempImage.getTileW();
-		envDeltaY = tempImage.getH()/tempImage.getTileH();
-		collisionStop = envDeltaX * envDeltaY / 2;
-		
-		enviromentTexture = new Image[(tempImage.getW()/tempImage.getTileW())*(tempImage.getH()/tempImage.getTileH())];
-		
-		for(int y = 0; y < tempImage.getH()/tempImage.getTileH(); y++)
-			for(int x = 0; x < tempImage.getH()/tempImage.getTileH(); x++){
-				enviromentTexture[x + y * envDeltaX] = tempImage.getTileImage(x, y);
-				if(x + y * envDeltaX < collisionStop)
-					enviromentTexture[x + y * envDeltaX].setLightBlock(Light.FULL);
-			}
-		GFX levelImage = new GFXMap(path+".png");
+		String path = GameContainer.getMainPath() + (directory.equals("building\\") ? directory : "levels\\") + levelName + ".png";
+		loadEnviroment();
+		GFX levelImage = new GFXMap(path);
 		
 		int levelWFull = levelImage.getW();
 		levelW = levelWFull / 2;
 		levelH = levelImage.getH();
+		
+		refreshCamera();
 		
 		collisionMap = new short[levelW * levelH][1];
 		
@@ -415,21 +419,17 @@ public class GameManager extends AbstractGame {
 				
 				/*Player*/
 				case "fe":
-					if(loadStuff) {
-						getPlayer().setPosX(x*TS);
-						getPlayer().setPosY(y*TS);
-					}
 					collisionMap[x + y * levelW][0] = 
-							(short) (Integer.parseInt(Integer.toHexString(levelImage.getP()[x + y * levelImage.getW()]).substring(4, 6))
-							+
-							Integer.parseInt(Integer.toHexString(levelImage.getP()[x + y * levelImage.getW()]).substring(6, 8))*envDeltaX);
+						(short) (Integer.parseInt(Integer.toHexString(levelImage.getP()[x + y * levelImage.getW()]).substring(4, 6))
+						+
+						Integer.parseInt(Integer.toHexString(levelImage.getP()[x + y * levelImage.getW()]).substring(6, 8))*envDeltaX);
 					break;
 				/*Environment*/
 				case "08":
 					collisionMap[x + y * levelW][0] = 
-					(short) (Integer.parseInt(Integer.toHexString(levelImage.getP()[x + y * levelImage.getW()]).substring(4, 6))
-					+
-					Integer.parseInt(Integer.toHexString(levelImage.getP()[x + y * levelImage.getW()]).substring(6, 8))*envDeltaX);
+						(short) (Integer.parseInt(Integer.toHexString(levelImage.getP()[x + y * levelImage.getW()]).substring(4, 6))
+						+
+						Integer.parseInt(Integer.toHexString(levelImage.getP()[x + y * levelImage.getW()]).substring(6, 8))*envDeltaX);
 					break;
 				case "fa":
 					collisionMap[x + y * levelW][0] = (byte) (
@@ -445,7 +445,24 @@ public class GameManager extends AbstractGame {
 				array[i][j] = enviromentTexture[collisionMap[i+j*levelW][0]].getLightBlock()==1;
 		Renderer.setLighBlockMap(array);
 	}
+
 	
+	private void loadEnviroment() {
+		ImageTile tempImage = (ImageTile) ImageBuffer.load(Images.enviroment);
+		
+		envDeltaX = tempImage.getW()/tempImage.getTileW();
+		envDeltaY = tempImage.getH()/tempImage.getTileH();
+		collisionStop = envDeltaX * envDeltaY / 2;
+		
+		enviromentTexture = new Image[(tempImage.getW()/tempImage.getTileW())*(tempImage.getH()/tempImage.getTileH())];
+		
+		for(int y = 0; y < tempImage.getH()/tempImage.getTileH(); y++)
+			for(int x = 0; x < tempImage.getH()/tempImage.getTileH(); x++){
+				enviromentTexture[x + y * envDeltaX] = tempImage.getTileImage(x, y);
+				if(x + y * envDeltaX < collisionStop)
+					enviromentTexture[x + y * envDeltaX].setLightBlock(Light.FULL);
+			}
+	}
 	/**
 	 * Iterates thought bullets in the world 
 	 * @param posX position of object in X
@@ -467,8 +484,6 @@ public class GameManager extends AbstractGame {
 	public GameObject getObject(Objects tag) {
 		return gameObjects.getObject(tag);
 	}
-	
-	
 	
 	public GameObject getObjectAt(int x, int y) {
 		return gameObjects.getObjectAt(x, y);
@@ -550,7 +565,7 @@ public class GameManager extends AbstractGame {
 		int x = (int) xIn;
 		int y = (int) yIn;
 		
-		if(x+y*levelW < collisionMap.length && x+y*levelW >= 0)
+		if(x+y*levelW < collisionMap.length && x+y*levelW >= 0) {
 			if(id > (collisionStop/2) && (id<collisionStop) || id > ((collisionStop*3)/2) - 1 && (id<collisionStop * 2)) {
 				if(collisionMap[x + y*levelW].length > 1) {
 					
@@ -594,13 +609,14 @@ public class GameManager extends AbstractGame {
 				collisionMap[x + y*levelW] = new short[1];
 				collisionMap[x + y*levelW][0] = (short) id;
 			}
+			Renderer.updateCollisionMap(x, y, enviromentTexture[id].getLightBlock()==1);
+		}
 	}
 	
 	public void saveMap() {
-		ImageStorage.saveLevel(collisionMap, levelW, levelH, 
-				GameContainer.getMainPath() + "building/" + levelName + "/"+levelName+".png",
+		ImageStorage.saveLevel(collisionMap, levelW, levelH, ""+levelName,
 				this);
-		CreativeSave.createSave(this, levelName);
+		Storage.updateSave(levelName.toString(), this);
 	}
 
 	public short getBlockAt(int destX, int destY) {
@@ -644,11 +660,35 @@ public class GameManager extends AbstractGame {
 		return camera.getOffY();
 	}
 
-	public void changeLevel(Levels level) {
+	public void changeLevel(Levels level, int dX, int dY) {
+		Player pl = gameObjects.getPlayer();
+		pl.setPosX(pl.getPosX()+dX*TS);
+		pl.setPosY(pl.getPosY()+dY*TS);
+		gameObjects.add(pl);
+		Storage.updateSave(currentSaveName+levelName.toString(), this);
+		curObj = null;
 		
+		GameObjects gameObjects2 = subLevels.get(level);
+		if(gameObjects2 == null) {
+			Mod mod;
+			if(gameObjects.getPlayer() instanceof Creater)
+				mod = Mod.creater;
+			else
+				mod = Mod.player;
+			loadGameLevel(level, mod);
+		}else 
+			gameObjects = gameObjects2;
+
+		Player pl2 = gameObjects.getPlayer();
+		pl.setTileX(pl2.getTileX());
+		pl.setTileY(pl2.getTileY());
+		gameObjects.add(pl);
+		curObj = gameObjects;
+		refreshCamera();
 	}
+	
 	public void setCurrentSaveName(String name) {
-		currentSaveName = name;
+		currentSaveName = name+"\\";
 	}
 	public String getCurrentSaveName() {
 		return currentSaveName;
@@ -658,7 +698,165 @@ public class GameManager extends AbstractGame {
 		return GameContainer.getMainPath()+directory+currentSaveName;
 	}
 
-	public String getDirectory() {
+	public static String getDirectory() {
 		return directory;
+	}
+	
+	public void createEmptyWorld(int w, int h, Levels name) {
+
+		menuManager.setTurnedOn(false);
+		
+		collisionMap = new short[w*h][];
+		
+		levelW = w;
+		levelH = h;
+		
+		short num = Short.parseShort(Integer.toString(getCollisionStop()));
+		
+		for(int x = 0; x < w; x++) {
+			for(int y = 0; y < h; y++) {
+				collisionMap[x+y*w] = new short[1];
+				collisionMap[x+y*w][0] = num;
+			}
+		}
+		
+		loadEnviroment();
+		playGround = new Ground(levelW, levelH);
+		
+		gameObjects.clear();
+		gameObjects.add(new Player(0, 0));
+		curObj = gameObjects;
+		this.levelName = name;
+		currentSaveName = "";
+		directory = "building\\";
+		
+		saveMap();
+
+		
+		camera = new Camera(Objects.player);
+		gameStarted = true;
+		
+		loadGameLevel(name, Mod.creater);
+	}
+	
+	public void fixiseCamera(CameraStates cs) {
+		switch(cs) {
+		case FULLFIXED:
+			camera = new Camera(Objects.player) {
+				@Override
+				public void update(GameContainer gc, GameManager gm, float dt) {
+					
+				}
+			};
+			break;
+		case XFIXED:
+			camera = new Camera(Objects.player) {
+			@Override
+			public void update(GameContainer gc, GameManager gm, float dt) {
+				if(target  == null) {
+					target = gm.getObject(targetTag);
+				}
+				
+				if(target == null) {
+					return;
+				}
+				float targetY = (target.getPosY() + target.getHeight() / 2) - GameContainer.getHeight() / 2;
+			
+				offY -= dt * (offY - targetY) * 10;
+
+				if(offY < 0)
+					offY = 0;
+				else
+					
+					if(offY + GameContainer.getHeight() > gm.getLevelH()*GameManager.TS) 
+						offY = gm.getLevelH() * GameManager.TS - GameContainer.getHeight();
+				
+			}
+			};
+			break;
+		case YFIXED:
+			camera = new Camera(Objects.player) {
+				@Override
+				public void update(GameContainer gc, GameManager gm, float dt) {
+					if(target  == null) {
+						target = gm.getObject(targetTag);
+					}
+					
+					if(target == null) {
+						return;
+					}
+					float targetX = (target.getPosX() + target.getWidth() / 2) - GameContainer.getWidth() / 2;
+					
+					offX -= dt * (offX - targetX) * 10;
+					
+					if(offX < 0)
+						offX = 0;
+					else
+						if(offX + GameContainer.getWidth() > gm.getLevelW()*GameManager.TS) 
+							offX = gm.getLevelW() * GameManager.TS - GameContainer.getWidth();
+					
+				}
+			};
+			break;
+		case FOLLOWING:
+			camera = new Camera(Objects.player);
+			break;
+		case STEPPING:
+			camera = new Camera(Objects.player) {
+				@Override
+				public void update(GameContainer gc, GameManager gm, float dt) {
+					if(target  == null) {
+						target = gm.getObject(targetTag);
+					}
+					
+					if(target == null) {
+						return;
+					}
+					
+					float targetX = (target.getPosX());// + target.getWidth() / 2) - GameContainer.getWidth() / 2;
+					float targetY = (target.getPosY());// + target.getHeight() / 2) - GameContainer.getHeight() / 2;
+					
+					if(targetX < offX) {
+						offX-=GameContainer.getWidth();
+					}
+					else
+						if(targetX > offX+GameContainer.getWidth())
+							offX+=GameContainer.getWidth();
+					
+					if(targetY < offY) {
+						offY-=GameContainer.getHeight();
+					}
+					else
+						if(targetY > offY+GameContainer.getHeight())
+							offY+=GameContainer.getHeight();
+				}
+			};
+			break;
+		default:
+			break;
+		}
+		
+	}
+	public void refreshCamera() {
+		boolean xLess = levelW*TS<GameContainer.getWidth();
+		boolean yLess = levelH*TS<GameContainer.getHeight();
+
+		int camX, camY;
+		camX = GameContainer.getWidth()/3 - levelW/2;
+		camY = GameContainer.getHeight()/3 - levelH/2;
+		if(xLess&&yLess) {
+			fixiseCamera(CameraStates.FULLFIXED);
+			camera.setOffX(-camX);
+			camera.setOffY(-camY);
+		}else if(xLess){
+			fixiseCamera(CameraStates.XFIXED);
+			camera.setOffX(-camX);
+		}else 
+			if(yLess){
+			fixiseCamera(CameraStates.YFIXED);
+			camera.setOffY(-camY);
+		}else {
+			fixiseCamera(defaultCameraState);
+		}
 	}
 }

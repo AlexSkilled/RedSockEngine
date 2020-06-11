@@ -115,8 +115,15 @@ public class CreaterInventory extends PlayerInventory{
 							changeBlock(gm.getBlockAt(destX, destY));
 						}
 					else {
-						if(gc.getInput().isButton(3))
-							gm.setBlock(lookAtX, lookAtY, GameManager.getCollisionStop());
+						if(gc.getInput().isButton(3)) {
+							if(inv[inHand] instanceof Entity) {
+								Entity tempEntity = (Entity) inv[inHand];
+								tempEntity.setTileX(lookAtX);
+								tempEntity.setTileY(lookAtY);
+								gm.getGround().putEntity(tempEntity);
+							}else
+								gm.setBlock(lookAtX, lookAtY, GameManager.getCollisionStop());
+							}
 						}
 					}
 				}

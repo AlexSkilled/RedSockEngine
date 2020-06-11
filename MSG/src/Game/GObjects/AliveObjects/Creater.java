@@ -123,7 +123,7 @@ public class Creater extends Player{
 	}
 	@Override
 	public String toString() {
-		return "AliveObject Player" + posX + " " + posY + " 100 100 0 player \n" + 
+		return "AliveObject Player " + posX + " " + posY + " 100 100 0 player \n" + 
 				"null:null:null:null:null:null:null:null:";
 	}
 }

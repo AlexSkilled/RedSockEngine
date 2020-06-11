@@ -8,7 +8,6 @@ import com.Game.Engine.GameContainer;
 public class Runner {
 	
 	public static void main(String args[]) {
-		
 		int width = 800, height = 480, TS = 32;
 		float scale = 2f;
 		
