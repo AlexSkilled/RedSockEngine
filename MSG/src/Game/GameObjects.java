@@ -39,6 +39,7 @@ public class GameObjects extends ProgrammObject implements GameObjectsContainer{
 				if(temp.get(i).isDead()) {
 					temp.remove(temp.get(i));
 					i--;
+					continue;
 				}
 				temp.get(i).update(gc, gm, dt);
 			}
