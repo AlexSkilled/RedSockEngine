@@ -277,10 +277,18 @@ public class Renderer {
 			newWidth -= newWidth + offX - pixelWidth;		
 		if(newHeight + offY > pixelHeight) 
 			newHeight -= newHeight + offY - pixelHeight;
+		
+		int[] pixs = image.getP();
+		int w = image.getW();
+		int lBlo = image.getLightBlock();
+		
 		for(int y = newY; y < newHeight; y++) {
 			for(int x = newX; x < newWidth; x++) {
-				setPixel((int) (x + offX) ,(int) (y + offY), image.getP()[x + y * image.getW()]);
-				setLightBlock((int) (x + offX) , (int) (y + offY), image.getLightBlock());
+				setPixel((int) (x + offX) ,(int) (y + offY), pixs[x + y * w]);
+				
+				if(pixs[x + y * w]!=16777215) {
+					setLightBlock(x + offX, y + offY, lBlo);
+				}
 			}
 		}
 	}
@@ -319,11 +327,19 @@ public class Renderer {
 		if(newHeight + offY > pixelHeight)
 			newHeight -= newHeight + offY - pixelHeight;
 		
+		int[] pixs = image.getP();
+		int tileW = image.getTileW(), tileH = image.getTileH(), w = image.getW();
+		int lBlo = image.getLightBlock();
+		
 		for(int y = newY; y < newHeight; y++) {
 			for(int x = newX; x < newWidth; x++) {
 				setPixel(x + offX, y + offY,
-						image.getP()[(x + tileX * image.getTileW()) + (y + tileY * image.getTileH()) * image.getW()]);	
-				setLightBlock(x + offX, y + offY, image.getLightBlock());
+						pixs[(x + tileX * tileW) + (y + tileY * tileH) * w]);	
+				System.out.println(pixs[(x + tileX * tileW) + (y + tileY * tileH) * w]);
+				if(pixs[(x + tileX * tileW) + (y + tileY * tileH) * w]!=16777215) {
+					setLightBlock(x + offX, y + offY, lBlo);
+				}
+				
 			}
 		}
 	}
@@ -402,6 +418,7 @@ public class Renderer {
 		int err = dx-dy;
 		int e2;
 		while(true) {
+			
 			int screenX = x0 - l.getRadius() + offX;
 			int screenY = y0 - l.getRadius() + offY;
 			int lightColor = l.getLightValue(x0, y0);
@@ -417,9 +434,17 @@ public class Renderer {
 
 			int x3 = (screenX+camX2)/texureSize, y3 = (screenY+camY2)/texureSize;
 			
-			if(x3 < newLB.length && x3>=0 && y3<newLB[x3].length && y3>=0)
+			if(x3 < newLB.length && x3>=0 && y3<newLB[x3].length && y3>=0) {
 				if(newLB[x3][y3]) 
 					return;
+				if(e2 > 0 && e2<lb.length) {
+					if(lb[e2]==Light.FULL) {
+						System.out.println(1);
+						return;
+					}
+				}
+					
+			}
 			setLightMap(screenX, screenY, lightColor);
 			
 			if(x0 == x1 && y1 == y0) 

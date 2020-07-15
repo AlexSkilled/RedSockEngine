@@ -54,7 +54,6 @@ public abstract class Enemy extends AliveObject{
 		anim += dt * animSpeed;
 		if(anim + dt * animSpeed >= 4)
 			anim = 0;
-			
 		
 		patrolX(gm, dt);
 		patrolY(gm, dt);
@@ -71,7 +70,6 @@ public abstract class Enemy extends AliveObject{
 	}
 	
 	public void patrolX(GameManager gm, float dt) {
-		
 		if(gm.getCollision((int) ((posX + GameManager.TS) / GameManager.TS), tileY) || 
 		   gm.getCollision((int) ((posX - 1) / GameManager.TS), tileY))
 			directionX = !directionX;
@@ -92,7 +90,6 @@ public abstract class Enemy extends AliveObject{
 			moveW(gm, dt);
 		else
 			moveS(gm, dt);
-
 	}
 	
 	protected void walkTo(float destX, float destY) {

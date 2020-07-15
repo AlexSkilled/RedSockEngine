@@ -9,6 +9,7 @@ import com.Game.Engine.Renderer;
 import com.Game.Engine.gfx.buffer.ImageBuffer;
 import com.Game.Engine.gfx.buffer.Images;
 import com.Game.Enums.CameraStates;
+import com.Game.Enums.Objects;
 
 import Game.GameManager;
 import Game.GObjects.AliveObjects.Player;
@@ -219,20 +220,44 @@ public class WorkingConsole extends Info{
 					gm.saveMap();
 					break;
 			case CAMERA:
+				int errorID = -1;
 				try {
-					System.out.println(command[1]);
-					if(command[1].equals("FIX"))
+					switch(ConsoleCommands.valueOf(command[1])) {
+					case FIX:
+						errorID = 0;
 						gm.fixiseCamera(CameraStates.valueOf(command[2]));
-					else
-						if(command[1].equals("SAVE")) {
-							Storage.updateSaveWithCamera(gm.getLevel()+"", gm);
-						}
-					else {
-						gm.getCamera().setOffX(Integer.parseInt(command[1]));
+						break;
+					case SAVE:
+						errorID = 1;
+						Storage.updateSaveWithCamera(gm.getLevel()+"", gm);
+						break;
+					case CHANGEOBJECTTAG:
+						errorID = 2;
+						gm.getCamera().setTargetTag(Objects.valueOf(command[2]));
+						break;
+					default:
+						errorID = 3;
 						gm.getCamera().setOffY(Integer.parseInt(command[2]));
+						gm.getCamera().setOffX(Integer.parseInt(command[1]));
 					}
 				}catch(IndexOutOfBoundsException e) {
-					throwError("CAMERA FIX CAMERA STATE \nOR\n CAMERA OFFX OFFY");
+					switch(errorID) {
+					case -1:
+						throwError("UNKNOW ERROR");
+						break;
+					case 0:
+						throwError("CAMERA FIX CAMERA STATE");
+						break;
+					case 1:
+						throwError("SAVE");
+						break;
+					case 2:
+						throwError("CAMERA CHANGEOBJECTTAG OBJECT_TAG");
+						break;
+					case 3:
+						throwError("CAMERA OFFX OFFY");
+						break;
+					}
 				}
 				break;
 			default:

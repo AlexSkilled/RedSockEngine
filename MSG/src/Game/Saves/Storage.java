@@ -74,27 +74,24 @@ public class Storage{
 	
 	public static void updateSave(String name, GameManager gm){
 		 try {
-			 
 				String path = GameContainer.getMainPath() + GameManager.getDirectory() + name;
 				File newF = new File(path);
 				
-				if(newF.isDirectory())
-					if(!name.equals(gm.getCurrentSaveName())) {
-						
-						String old = gm.getCurrentGameSaveFile();
-						
-						copyFolder(new File(old), newF, null);
-						
-						deleteSave(old);
-						
-						gm.setCurrentSaveName(name);
-						path = gm.getCurrentGameSaveFile();
-					}
-
-				String save = "LevelName:" + gm.getLevel() + "\n" + gm.getAllObjects().toString();
-
 				
-				path += ".save";
+				if(!name.equals(gm.getCurrentSaveName()+gm.getLevel())) {
+					String old = gm.getCurrentGameSaveFile();
+					
+					copyFolder(new File(old), newF, null);
+					
+					deleteSave(old);
+					
+					gm.setCurrentSaveName(name);
+					path = gm.getCurrentGameSaveFile();
+				}
+				
+				String save = "LevelName:" + gm.getLevel() + "\n" + GameManager.TS +"\n"+gm.getAllObjects().toString();
+				
+				path += gm.getLevel() + ".save";
 				PrintWriter pw = new PrintWriter(path, "UTF-8");
 				pw.print(save);
 				pw.close();

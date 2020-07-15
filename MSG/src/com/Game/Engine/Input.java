@@ -47,7 +47,6 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
 		for(int i = 0; i < NUM_BUTTONS; i++) {
 			buttonsLast[i] = buttons[i];
 		}
-		
 	}
 	
 	public String getPressed() {

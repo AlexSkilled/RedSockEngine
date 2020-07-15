@@ -88,10 +88,14 @@ public class GameObjects extends ProgrammObject implements GameObjectsContainer{
 	public GameObject getObject(Objects tag) {
 		try {
 			return allObjects.get(tag).get(0);
-		}catch (NullPointerException e) {
+		}catch (NullPointerException | IndexOutOfBoundsException e) {
 			for(int i = 0; i < allObjects.get(Objects.entity).size(); i++) {
 				if(allObjects.get(Objects.entity).get(i).getTag().equals(tag))
 					return allObjects.get(Objects.entity).get(i);
+			}
+			for(int i = 0; i < allObjects.get(Objects.enemy).size(); i++) {
+				if(allObjects.get(Objects.enemy).get(i)!=null)
+					return allObjects.get(Objects.enemy).get(i);
 			}
 			return null;
 		}

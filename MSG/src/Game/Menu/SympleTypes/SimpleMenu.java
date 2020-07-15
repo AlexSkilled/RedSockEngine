@@ -56,6 +56,7 @@ public abstract class SimpleMenu{
 		}
 		
 		if(gm.getCamera() != null) {
+			
 			newOffX = (int) gm.getCamera().getOffX();
 			newOffY = (int) gm.getCamera().getOffY();
 			if(cameraOffX != newOffX || cameraOffY != newOffY) {
@@ -63,13 +64,14 @@ public abstract class SimpleMenu{
 				cameraOffY = (int) gm.getCamera().getOffY();
 				for(int i = 0; i < paragraphs.size(); i++)
 					setupButtonLocation(paragraphs.get(i), i, offX, offY);
+				for(int i = 0; i < relativeBtns.size(); i++)
+					setupRelButtonLocation(relativeBtns.get(i));
 			}
 		}
 		else {
 			cameraOffX = 0;
 			cameraOffY = 0;
 		}
-		
 		if(mouseX == gc.getInput().getMouseX() + cameraOffX && mouseY == gc.getInput().getMouseY() + cameraOffY){
 			mouseManaging = false;
 			
@@ -89,7 +91,7 @@ public abstract class SimpleMenu{
 		
 		for(int i = relativeBtns.size() - 1; i >= 0; i--) {
 			relativeBtns.get(i).update(mouseX, mouseY, mouseManaging, gc, gm);
-			setButtonLocation(relativeBtns.get(i));
+			//setButtonLocation(relativeBtns.get(i));
 		}		
 		
 		if(gc.getInput().isButtonUp(1)) {
@@ -173,10 +175,11 @@ public abstract class SimpleMenu{
 	protected void setButtonLocation(SimpleButton simpleButton) {
 		int X, Y, W, H;
 		
-		X = (int) (simpleButton.getRelX() * GameContainer.getWidth());
-		Y = (int) (simpleButton.getRelY() * GameContainer.getHeight());
+		X = (int) Math.floor(simpleButton.getRelX() * GameContainer.getWidth());
+		Y = (int) Math.floor(simpleButton.getRelY() * GameContainer.getHeight());
 		W = (int) (simpleButton.getRelWidth() * GameManager.TS);
 		H = (int) (simpleButton.getRelHeight() * GameManager.TS);
+		
 		
 		if(!simpleButton.isSelected()) {	
 			simpleButton.setX(X);
@@ -200,6 +203,29 @@ public abstract class SimpleMenu{
 		simpleButton.setRelativeHeight(GameContainer.getHeight() / 8);
 		
 		setButtonLocation(simpleButton);
+	}
+	
+	protected void setupRelButtonLocation(SimpleRelButton simpleButton){
+		
+		int X, Y, W, H;
+		
+		X = (int) (GameContainer.getWidth()*simpleButton.getRelX() + cameraOffX + offX);
+		Y = (int) (GameContainer.getHeight()*simpleButton.getRelX() + cameraOffY + offY);
+		W = (int) (simpleButton.getRelWidth() * GameManager.TS);
+		H = (int) (simpleButton.getRelHeight() * GameManager.TS);
+		
+		
+		if(!simpleButton.isSelected()) {	
+			simpleButton.setX(X);
+			simpleButton.setY(Y);
+			simpleButton.setWidth(W);
+			simpleButton.setHeight(H);
+		}else {
+			simpleButton.setX(X - GameContainer.getWidth() / 64);
+			simpleButton.setY(Y - GameContainer.getHeight() / 64);
+			simpleButton.setWidth(W + GameContainer.getWidth() / 32);
+			simpleButton.setHeight(H + GameContainer.getHeight() / 32);
+		}
 	}
 	
 	public void addButton(SimpleButton button) {

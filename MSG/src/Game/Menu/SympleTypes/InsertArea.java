@@ -78,14 +78,16 @@ public class InsertArea extends SimpleButton{
 				case "Escape":
 					focused = false;
 					break;
-				}
 				
-				if(!focused) {
+				case "Period":
+					insertText(".");
+					break;
+				}if(!focused) {
 					gc.getInput().turnOffInserting();
 				}
 			}
 		}
-		if(pointerChanger<pointerChangerMax)
+		if(pointerChanger < pointerChangerMax)
 			pointerChanger++;
 		else
 			pointerChanger = 0;
@@ -107,6 +109,10 @@ public class InsertArea extends SimpleButton{
 		gc.getInput().turn();
 	}
 	
+	private void insertText(String t) {
+		name = name.substring(0, pointer) + t + name.substring(pointer);
+	}
+	
 	protected void setUpColors() {
 		colorInner = 0xff00ff00;
 		colorOuter = 0xffff00ff;
@@ -122,6 +128,7 @@ public class InsertArea extends SimpleButton{
 	public void refresh() {
 		name = "";
 		focused = false;
+		pointer = 0;
 		setUpColors();
 	}
 	

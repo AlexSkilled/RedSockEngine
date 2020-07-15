@@ -147,18 +147,7 @@ public abstract class GFX {
 	
 	public void downgrade(double resizeW, double resizeH) {
 		int[] newArray;
-		/*
-		newArray = new int[(int) (w) * (int) (h)];
 		
-		int startX = (int) (w*(1-resizeW))*2;
-		int startY = (int) (h*(1-resizeH))*2;
-		
-		for(int i = startY; i < h; i++)
-			for(int y = 0; y < resizeH; y++)
-				for(int j = startX; j < w; j++)
-					for(int x = 0; x < resizeW; x++)
-						newArray[(int) (j * resizeW) + x + ((int) (i * resizeH) + y) * ((int) (w * resizeW))] = p[j + i * w];
-		*/
 		int resdH = (int) (h*resizeH), 
 				resdW = (int) (w*resizeW); 	
 		
@@ -181,6 +170,7 @@ public abstract class GFX {
 						newArray[(int) (x * resizeW) + i + ((int) (y * resizeH) + j) * resdW] = p[x+y*w];
 			}
 		}
+
 		for(int y = startY; y < h; y++) {
 			for(int j = 0; j < resizeH; j++)	
 				for(int x = startX; x >= 0; x--) {
@@ -193,27 +183,13 @@ public abstract class GFX {
 						newArray[(int) (x * resizeW) + i + ((int) (y * resizeH) + j) * resdW] = p[x+y*w];
 			}
 		}
-		
-		/*
-		int nStartX = (int) (w*(1-resizeW))*2;
-		int nstartY = (int) (h*(1-resizeH))*2;
-		
-		for(int x = 0; x < resdH; x++)
-				for(int y = 0; y < resdW; y++)
-						p[x+startX+(y+startY)*w] = newArray[(x) + (y)*resdW];
-						//newArray[(int) (j * resizeW) + x + ((int) (i * resizeH) + y) * ((int) (w * resizeW))] = p[j + i * w];
-		*/
+	
 		int dX = (w - resdW)/2;
 		int dY = (h - resdH)/2;
 		p = new int[w*h];
 		for(int y = 0; y < resdH; y++)
 			for(int x = 0; x < resdW; x++)
 				p[x + dX +(y+dY)*w] = newArray[x+y*resdW]; 
-		//w = (int) (w * resizeW);
-		//h = (int) (h * resizeH);
-		//p = newArray;
-		
-		
 	}
 	
 	public static boolean checkImage(int w, int h, int[] p) {

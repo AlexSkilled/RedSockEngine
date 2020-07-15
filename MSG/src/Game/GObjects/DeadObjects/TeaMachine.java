@@ -51,6 +51,7 @@ public class TeaMachine extends Entity{
 				gm.continueGame();
 				gc.getInput().turnOffInserting();
 				menuOpened = false;
+				
 				menuManager.updateScene(Menus.PauseMenu);
 			}
 		};
@@ -58,6 +59,7 @@ public class TeaMachine extends Entity{
 
 		mi.changeBackButton(new SimpleButton("Back") {
 			public void act(GameManager gm, GameContainer gc, SimpleMenuManager menuManager) {
+				menuManager.setWorkingBackGround(false);
 				menuManager.updateScene(Menus.PauseMenu);
 				gm.continueGame();
 				gc.getInput().turnOffInserting();

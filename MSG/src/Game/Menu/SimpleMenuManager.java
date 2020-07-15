@@ -2,8 +2,11 @@ package Game.Menu;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
 import com.Game.Engine.GameContainer;
@@ -31,13 +34,37 @@ public class SimpleMenuManager extends ProgrammObject {
 	
 	private SimpleMenu activeScene;
 	private Menus backUpScene;
-	private boolean turnedOn, background;
+	private boolean turnedOn, background, workingBackground;
 	
 	protected int mouseX, mouseY;
 	
 	public SimpleMenuManager() {
+		
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(GameContainer.getMainPath() + "settings/preps/Menu.cfg"));
+			
+			String line_; 
+			String[] arr = new String[2];
+			boolean bol;
+			while((line_ = br.readLine()) != null) {
+				arr = line_.split(":");
+				bol = arr[1].equals("true");
+				switch(arr[0]) {
+				case "background":
+					background = bol;
+					break;
+				case "workingBackground":
+					workingBackground = bol;
+					break;
+				}
+			}
+			br.close();
+			
+		} catch (IOException e) {
+			GameContainer.addError(e);
+			e.printStackTrace();
+		}
 		turnedOn = true;
-		background = true;
 		menus = new HashMap<Menus, SimpleMenu>();
 		fill();
 	}
@@ -59,6 +86,7 @@ public class SimpleMenuManager extends ProgrammObject {
 	}	
 	
 	private void fill() {
+		
 		/*Basic buttons*/
 		SimpleButton exitButton = new SimpleButton("Exit") {
 			public void act(GameManager gm, GameContainer gc, SimpleMenuManager menuManager) {
@@ -92,7 +120,7 @@ public class SimpleMenuManager extends ProgrammObject {
 		tempMenu.addButton(new SimpleButton("Start Game") {
 			
 			public void act(GameManager gm, GameContainer gc, SimpleMenuManager menuManager) {
-				if(!gm.isGameStarted()){
+				if(!gm.isGameStarted() || gm.isGameStarted() && isWorkingBackground()){
 					gm.startNewGame();
 					backUpScene = Menus.PauseMenu;
 					updateScene(Menus.PauseMenu);
@@ -128,8 +156,9 @@ public class SimpleMenuManager extends ProgrammObject {
 				backUpScene = Menus.MainMenu;
 				updateScene(Menus.MainMenu);
 				gm.stopGame();
+				gm.init(gc);
 			}
-			});
+		});
 
 		tempMenu.addButton(exitButton);
 		
@@ -155,19 +184,29 @@ public class SimpleMenuManager extends ProgrammObject {
 					}
 				});
 				
+				addButton(new SimpleButton("Fancy MenuBacks") {
+					public void act(GameManager gm, GameContainer gc, SimpleMenuManager menuManager) {
+						if(turnWorkingBackground()) {
+							gm.init(gc);
+						}else {
+							gm.stopGame();
+						}
+					}
+				});
+				
 				ComplexButton compBtn = new ComplexButton("Resolution");
 				
 				try {
-					@SuppressWarnings("resource")
 					BufferedReader br = new BufferedReader(new FileReader(GameContainer.getMainPath() + "settings/preps/ResolutionButtons.cfg"));
 					
 					String line_ = "", 
 						   temp = br.readLine();
-					
+
 					while(temp != null) {
 						line_ += temp + "\n";
 						temp = br.readLine();
 					}
+					br.close();
 					
 					for(String line : line_.split("\n")){
 						
@@ -258,7 +297,6 @@ public class SimpleMenuManager extends ProgrammObject {
 
 		        		@Override
 		        		public void act(GameManager gm, GameContainer gc, SimpleMenuManager menuManager) {
-		        			//Storage.loadSave("saves\\" + getName()).split("\n")[0].split(":")[1]
 		        			gm.loadGame("saves\\", getName());
 		        			backUpScene = Menus.PauseMenu;
 							updateScene(Menus.PauseMenu);
@@ -401,24 +439,51 @@ public class SimpleMenuManager extends ProgrammObject {
 			}else
 				updateScene(backUpScene);
 	}
+
+	public boolean isTurnedOn() {
+		return turnedOn;
+	}
 	
+	public boolean isBackground() {
+		return background;
+	}
+	
+	public boolean isWorkingBackground() {
+		return workingBackground;
+	}
 	/**
 	 * Changes current status to opposite
 	 */
 	public void turn() {
 		turnedOn = !turnedOn;
 	}
-	
-	public boolean isTurnedOn() {
-		return turnedOn;
-	}
-	
 
 	public void setTurnedOn(boolean turnedOn) {
 		this.turnedOn = turnedOn;
 	}
-
-	public boolean isBackground() {
-		return background;
+	
+	public boolean turnWorkingBackground() {
+		this.workingBackground = !this.workingBackground;
+		updateMenuConfig();
+		return workingBackground;
+	}
+	
+	public void setWorkingBackGround(boolean workingBackground) {
+		this.workingBackground = workingBackground;
+		updateMenuConfig();
+	}
+	
+	public void updateMenuConfig() {
+		try {
+			PrintWriter pw;
+			pw = new PrintWriter(GameContainer.getMainPath() + "settings/preps/Menu.cfg", "UTF-8");
+			String data =	"background:" + background + "\n"+
+					 		"workingBackground:" + workingBackground;
+			pw.print(data);
+			pw.close();
+		 
+		 } catch (FileNotFoundException | UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 	}
 }

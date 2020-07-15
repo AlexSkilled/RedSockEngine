@@ -8,5 +8,5 @@ public enum ConsoleCommands {
 	SAVEMAP,
 	OVERRIDEMAP,
 	MAIN, AS,
-	CAMERA
+	CAMERA, FIX, CHANGEOBJECTTAG
 }

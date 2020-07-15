@@ -19,49 +19,52 @@ public class Window {
 		private Graphics g;
 		private Dimension dms;
 		private GameContainer gc;
-		
 		public Window(GameContainer gc) {
+			this.gc = gc;
 			
 			image = new BufferedImage(GameContainer.getWidth(), GameContainer.getHeight(), BufferedImage.TYPE_INT_RGB);
 			canvas = new Canvas();
-			dms = new Dimension((int) (GameContainer.getWidth()*GameContainer.getScale()),(int) (GameContainer.getHeight()*GameContainer.getScale()));
+			dms = new Dimension((int) (GameContainer.getWidth()*GameContainer.getScale()), (int) (GameContainer.getHeight()*GameContainer.getScale()));
 			canvas.setPreferredSize(dms);
 			canvas.setMinimumSize(dms);
+
 			
-			frame = new JFrame(gc.getTitle());
+			frame = new JFrame(GameContainer.getTitle());
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			frame.setLayout(new BorderLayout());
 			frame.add(canvas, BorderLayout.CENTER);
 			frame.pack();
 			frame.setLocationRelativeTo(null);
-			frame.setResizable(false);
 			frame.setVisible(true);
 			canvas.createBufferStrategy(2);
 			bs = canvas.getBufferStrategy();
 			g = bs.getDrawGraphics();
 		}
 		
-		protected void refresh(GameContainer gc) {
-			image = new BufferedImage(GameContainer.getWidth(),GameContainer.getHeight(),BufferedImage.TYPE_INT_RGB);
-			canvas = new Canvas();
-			dms = new Dimension((int) (GameContainer.getWidth()*GameContainer.getScale()),(int) (GameContainer.getHeight()*GameContainer.getScale()));
+		protected void refresh() {
+			dms = new Dimension((int) (GameContainer.getWidth()*GameContainer.getScale()), (int) (GameContainer.getHeight()*GameContainer.getScale()));
 			canvas.setPreferredSize(dms);
-			canvas.setMinimumSize(dms);
 			
-			frame = new JFrame(gc.getTitle());
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			frame.setLayout(new BorderLayout());
-			frame.add(canvas, BorderLayout.CENTER);
-			frame.pack();
-			frame.setLocationRelativeTo(null);
-			frame.setResizable(false);
-			frame.setVisible(true);
 			canvas.createBufferStrategy(2);
 			bs = canvas.getBufferStrategy();
 			g = bs.getDrawGraphics();
 		}
 		
 		public void update() {
+		
+			int canvWH = canvas.getWidth() * canvas.getHeight();
+			int curScale = (int) (GameContainer.getWidth()*GameContainer.getScale()) * (int) (GameContainer.getHeight()*GameContainer.getScale());
+			
+			if(canvWH != curScale) {
+				System.out.println();
+				System.out.println(canvWH);
+				System.out.println(curScale);
+				System.out.println((double) canvWH/curScale);
+				gc.setScale((int) (GameContainer.getScale() * ((double) canvWH/curScale)));
+				dms = new Dimension((int) (GameContainer.getWidth()*GameContainer.getScale()), (int) (GameContainer.getHeight()*GameContainer.getScale()));
+				refresh();
+				gc.refresh(); 
+			}		
 			g.drawImage(image, 0, 0, canvas.getWidth(), canvas.getHeight(), null);
 			bs.show();
 		}
@@ -77,7 +80,6 @@ public class Window {
 		public JFrame getFrame() {
 			return frame;
 		}
-		
 		
 		protected void updateBounds() {
 			

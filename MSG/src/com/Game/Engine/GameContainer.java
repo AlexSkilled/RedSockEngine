@@ -25,8 +25,8 @@ public class GameContainer implements Runnable {
 		private boolean running = false;// игра ваще работает?
 		public final double UPDATE_CAP = 1.0/60;//частота обновлений в секунду
 		private static int width = 800, height = 480;//Разрешение
-		private static float scale = 2f;//увеличение разрешения
-		private String title = "RedSock engine";//название
+		private static Double scale = 2.0;//увеличение разрешения
+		private static String title = "RedSock engine";//название
 		
 		public GameContainer(GameManager game) {
 			this.game = game;
@@ -36,7 +36,6 @@ public class GameContainer implements Runnable {
 		
 		public void start() {
 			window = new Window(this);
-
 			renderer = new Renderer(this);
 			input = new Input(this);
 			imageBuffer = new ImageBuffer();
@@ -155,20 +154,20 @@ public class GameContainer implements Runnable {
 			GameContainer.height = height;
 		}
 
-		public static float getScale() {
+		public static double getScale() {
 			return scale;
 		}
 
-		public void setScale(float scale) {
+		public void setScale(double scale) {
 			GameContainer.scale = scale;
 		}
 
-		public String getTitle() {
+		public static String getTitle() {
 			return title;
 		}
 
 		public void setTitle(String title) {
-			this.title = title;
+			GameContainer.title = title;
 		}
 
 		public Window getWindow() {
@@ -188,19 +187,22 @@ public class GameContainer implements Runnable {
 		}
 
 		public void refresh() {
-			renderer = null;
-			window.dispose();
 			
-			window = new Window(this);
-			window.setBounds((int) (width * scale), (int) (height*scale));
+			if(scale<1)
+				return;
+			
+			renderer = null;
+			//window.dispose();
+			window.refresh();
+			//window = new Window(this);
+			//window.setBounds((int) (width * scale), (int) (height*scale));
 			renderer = null;
 			renderer = new Renderer(this);
 			input = new Input(this);
 			ConfigStorage.updateConfig();
 		}
 
-		public void setBounds(int width, int height, float scale) {
-			
+		public void setBounds(int width, int height, double scale) {
 			GameContainer.width = width;
 			GameContainer.height = height;
 			GameContainer.scale = scale;

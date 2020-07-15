@@ -37,7 +37,7 @@ import Game.Saves.Storage;
 
 public class GameManager extends AbstractGame {
 
-	public static int TS = 64, lastTS = 64; //one Tile in pixels
+	public static int TS = 32, lastTS = 64; //one Tile in pixels
 	public static boolean pDimension = false;
 	
 	private Ground playGround; 				//map of items lying on floor
@@ -49,7 +49,7 @@ public class GameManager extends AbstractGame {
 	private CameraStates defaultCameraState = CameraStates.FOLLOWING;
 	private Levels levelName;
 	private String currentSaveName = "";
-	private static String directory;
+	private static String directory = "";
 	
 	private SimpleMenuManager menuManager;
 	private boolean draw;
@@ -85,6 +85,7 @@ public class GameManager extends AbstractGame {
 	public void update(GameContainer gc, float dt){
 
 		dt = dt * ((float) TS / 32);
+		
 		if(gc.getInput().isKeyUp(KeyEvent.VK_ESCAPE) && gameStarted){
 			menuManager.turn();
 		}
@@ -105,8 +106,12 @@ public class GameManager extends AbstractGame {
 		else
 			if(menuManager.isTurnedOn()){
 				menuManager.update(gc, this, dt);
+				if(menuManager.isWorkingBackground() && gameStarted) {
+					camera.update(gc, this, dt);
+					curObj.update(gc, this, dt);		
+				}
 			}
-		
+	
 		for(int i = 0; i < console.length; i++)
 			console[i].update(gc, this, dt);
 			
@@ -119,7 +124,7 @@ public class GameManager extends AbstractGame {
 		if(gameStarted) {
 			camera.render(r);
 			
-			if((!menuManager.isTurnedOn() || (menuManager.isTurnedOn() && menuManager.isBackground()))) {
+			if((!menuManager.isTurnedOn() || (menuManager.isTurnedOn() && (menuManager.isBackground() || menuManager.isWorkingBackground())))) {
 				draw = true;
 			}
 			
@@ -150,7 +155,6 @@ public class GameManager extends AbstractGame {
 	}
 	
 	public void startNewGame() {
-		
 		currentSaveName = (new Date()).toString();
 		String[] saveNameS = currentSaveName.split(" ");
 		
@@ -158,17 +162,18 @@ public class GameManager extends AbstractGame {
 				+ "_" + saveNameS[3].split(":")[0] + "_" + saveNameS[3].split(":")[1] + "\\";
 
 		directory = "saves\\";
-
+		levelName = null;
 		loadGame();
-		
 	}
 	
 	public void loadGame() {
+		camera = null;
 		Storage.createSave(currentSaveName, this);
 		loadGame(Storage.loadMap(currentSaveName+"main"));
 	}
 	
 	public void loadGame(String directory, String currentSaveName) {
+		camera = null;
 		GameManager.directory = directory;
 		this.currentSaveName = currentSaveName + "\\";
 		loadGame(Storage.loadMap(this.currentSaveName+"main"));
@@ -184,9 +189,13 @@ public class GameManager extends AbstractGame {
 		gameObjects.clear();
 		gameObjects = loadGameObjects(Storage.loadMap(currentSaveName + levelName), true);
 		curObj = gameObjects;
+		
 		if(camera == null)
 			camera = new Camera(Objects.player);
+		
 		gameStarted = true;
+
+		menuManager.setWorkingBackGround(false);
 	}
 	
 	private GameObjects loadGameObjects(String data, boolean loadSubLevels) {
@@ -343,6 +352,7 @@ public class GameManager extends AbstractGame {
 		camera = null;
 		gameObjects.clear();
 		curObj = null;
+		menuManager = new SimpleMenuManager();
 	}
 	
 	public void pauseGame() {
@@ -360,12 +370,26 @@ public class GameManager extends AbstractGame {
 	
 	@Override
 	public void init(GameContainer gc) {
+		currentSaveName = "";
 		gameObjects = new GameObjects();
 		menuManager = new SimpleMenuManager();
 		
 		console = new Info[2];
 		console[0] = new WorkingConsole();
 		console[1] = new InfoBar();
+		Levels[] lvls = Levels.values();
+		
+		directory = "levels\\";
+		levelName = lvls[0];
+		if(menuManager.isWorkingBackground()) {
+			gameObjects = loadGameObjects(Storage.loadMap("" + levelName), true);
+			curObj = gameObjects;
+			gameStarted = true;
+			FreeCamera cam = new FreeCamera(null, 1, 0);
+			camera = cam;
+			gameObjects.delete(getPlayer());
+		}
+		
 	}
 	
 	/**
@@ -378,7 +402,9 @@ public class GameManager extends AbstractGame {
 	 */
 	private void loadLevel() {
 		
-		String path = GameContainer.getMainPath() + (directory.equals("building\\") ? directory : "levels\\") + levelName + ".png";
+		String path = GameContainer.getMainPath() + 
+				(directory.equals("building\\") ? directory : "levels\\")
+					+ levelName + ".png";
 		loadEnviroment();
 		GFX levelImage = new GFXMap(path);
 		
@@ -665,7 +691,7 @@ public class GameManager extends AbstractGame {
 		pl.setPosX(pl.getPosX()+dX*TS);
 		pl.setPosY(pl.getPosY()+dY*TS);
 		gameObjects.add(pl);
-		Storage.updateSave(currentSaveName+levelName.toString(), this);
+		Storage.updateSave(currentSaveName+levelName, this);
 		curObj = null;
 		
 		GameObjects gameObjects2 = subLevels.get(level);
@@ -695,7 +721,7 @@ public class GameManager extends AbstractGame {
 	}
 
 	public String getCurrentGameSaveFile() {
-		return GameContainer.getMainPath()+directory+currentSaveName;
+		return GameContainer.getMainPath() + directory+currentSaveName;
 	}
 
 	public static String getDirectory() {
@@ -837,6 +863,7 @@ public class GameManager extends AbstractGame {
 		}
 		
 	}
+	
 	public void refreshCamera() {
 		boolean xLess = levelW*TS<GameContainer.getWidth();
 		boolean yLess = levelH*TS<GameContainer.getHeight();

@@ -23,11 +23,13 @@ public class Player extends AliveObject{
 		super(posX, posY, 100, 0, Images.player);
 		createObject();
 		noClip = false;
+		objectImage.setLightBlock(1);
 	}
 	
 	public Player(String data) {
 		super(data);
 		createObject();
+		objectImage.setLightBlock(1);
 	}
 	
 	private void createObject() {
