@@ -40,11 +40,11 @@ public class Runner {
 		
 		GameManager gm = new GameManager(TS);
 		GameContainer gc = new GameContainer(gm);	
-		
+
 		gc.setWidth(width);
 		gc.setHeight(height);
-		
 		gc.setScale(scale);
+		
 		try {
 			gc.start();
 		}

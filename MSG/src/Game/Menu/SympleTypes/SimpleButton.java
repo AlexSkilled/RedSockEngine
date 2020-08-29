@@ -2,14 +2,22 @@ package Game.Menu.SympleTypes;
 
 import com.Game.Engine.GameContainer;
 import com.Game.Engine.Renderer;
+import com.Game.Engine.gfx.Image;
+import com.Game.Engine.gfx.buffer.ImageBuffer;
+import com.Game.Engine.gfx.buffer.Images;
 
 import Game.GameManager;
 import Game.Menu.SimpleMenuManager;
 
 public class SimpleButton {
 	protected String name, command;
-	protected int x, y, width, height, colorInner, colorOuter;
-	protected float xR, yR, widthR, heightR;
+	
+	protected static final Image image  = (Image) ImageBuffer.load(Images.Button, false);
+	
+	protected int x, y, width = image.getW(), height = image.getH(), colorInner, colorOuter;
+	protected float xR, yR, 
+			widthR = GameContainer.getWidth()/GameManager.TS, 
+			heightR = GameContainer.getHeight()/GameManager.TS;
 	protected boolean choosen, inField;
 	
 	public SimpleButton(String name) {
@@ -26,6 +34,7 @@ public class SimpleButton {
 		colorInner = 0xffa2a2a2;
 		colorOuter = 0xff0000ff;
 	}
+
 	
 	public void update(int mouseX, int mouseY, boolean mouseManaging, GameContainer gc, GameManager gm) {
 		if((mouseX  > x && mouseX < x + width) && (mouseY > y && mouseY < y + height)) {
@@ -37,8 +46,10 @@ public class SimpleButton {
 	}
 	
 	public void render(GameContainer gc, Renderer r) {
-		r.drawFillRect(x, y, width, height, getColor());
-		r.drawRect(x, y, width, height, colorOuter);
+		
+		//r.drawFillRect(x, y, width, height, getColor());
+		//r.drawRect(x, y, width, height, colorOuter);
+		r.drawImage(image, x, y);
 		r.drawText(getName(), x + width/2, y + height/4 , 0xff000000, true);
 	}
 	
@@ -97,7 +108,6 @@ public class SimpleButton {
 	}
 
 	public void setRelativeWidth(float i) {
-		
 		this.widthR = (float) (i/GameManager.TS);
 	}
 	

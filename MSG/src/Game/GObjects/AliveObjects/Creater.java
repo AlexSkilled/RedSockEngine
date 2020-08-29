@@ -67,7 +67,7 @@ public class Creater extends Player{
 	private void loadInvent(GameManager gm) {
 		ArrayList<Item> items = new ArrayList<Item>();
 		
-		ImageTile image = (ImageTile) ImageBuffer.load(Images.enviroment);
+		ImageTile image = (ImageTile) ImageBuffer.load(Images.Enviroment);
 		Image tempImage;
 		int w = image.getW()/image.getTileW(), h = image.getH()/image.getTileH();
 		

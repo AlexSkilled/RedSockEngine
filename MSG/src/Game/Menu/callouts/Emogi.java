@@ -18,7 +18,7 @@ public class Emogi extends GameObject{
 	
 	public Emogi(AliveObject object) {
 		go = object;
-		icon = ImageBuffer.load(Images.callOut);
+		icon = ImageBuffer.load(Images.CallOut);
 	}
 	
 	@Override

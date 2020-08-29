@@ -24,7 +24,7 @@ public class Renderer {
 	private int[] pixels;//массив с пикселями
 	private int[] zb;
 	private int texureSize;
-	private int ambientColor = 0xff2b2b2b;
+	private int ambientColor = 0xff2b2b2b;//0xffffffff;
 	private int[] lm;
 	private int[] lb;
 
@@ -249,6 +249,7 @@ public class Renderer {
 		//Метод отрисовки не постоянного изображения 
 		offX -= camX;
 		offY -= camY;
+		
 		if(image.isAlpha() && !processing) {
 			imageRequest.add(new ImageRequest(image, zDepth, offX, offY));
 			return;

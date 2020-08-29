@@ -20,7 +20,7 @@ public class Player extends AliveObject{
 	protected int destX, destY;
 	
 	public Player(int posX, int posY) {
-		super(posX, posY, 100, 0, Images.player);
+		super(posX, posY, 100, 0, Images.Hero);
 		createObject();
 		noClip = false;
 		objectImage.setLightBlock(1);

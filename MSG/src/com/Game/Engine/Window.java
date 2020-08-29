@@ -51,20 +51,16 @@ public class Window {
 		}
 		
 		public void update() {
-		
+		/*
 			int canvWH = canvas.getWidth() * canvas.getHeight();
 			int curScale = (int) (GameContainer.getWidth()*GameContainer.getScale()) * (int) (GameContainer.getHeight()*GameContainer.getScale());
 			
 			if(canvWH != curScale) {
-				System.out.println();
-				System.out.println(canvWH);
-				System.out.println(curScale);
-				System.out.println((double) canvWH/curScale);
 				gc.setScale((int) (GameContainer.getScale() * ((double) canvWH/curScale)));
 				dms = new Dimension((int) (GameContainer.getWidth()*GameContainer.getScale()), (int) (GameContainer.getHeight()*GameContainer.getScale()));
 				refresh();
 				gc.refresh(); 
-			}		
+			}		*/
 			g.drawImage(image, 0, 0, canvas.getWidth(), canvas.getHeight(), null);
 			bs.show();
 		}

@@ -231,7 +231,7 @@ public class AliveObject extends GameObject{
 
 	protected void moveW(GameManager gm, float dt) {
 		direction = 3;
-			if(gm.getCollision(tileX, tileY-1) || gm.getCollision(tileX + (int)Math.signum((int) offX), tileY - 1 )) {
+			if(gm.getCollision(tileX, tileY-1) || gm.getCollision(tileX + (int) Math.signum((int) offX), tileY - 1 )) {
 				if(offY > 0) {
 					offY -= dt * speed;
 					if(offY < 0) {

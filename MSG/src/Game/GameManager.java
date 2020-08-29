@@ -74,7 +74,7 @@ public class GameManager extends AbstractGame {
 	 */
 	public GameManager(int TS) {
 		GameManager.TS = TS;
-		ImageBuffer.load(Images.enviroment);
+		ImageBuffer.load(Images.Enviroment);
 	}
 
 	/**
@@ -142,12 +142,12 @@ public class GameManager extends AbstractGame {
 			}
 		}
 		
+		for(int i = 0; i < console.length; i++)
+			console[i].render(gc, r);
+
 		if(menuManager.isTurnedOn()){		
 			menuManager.render(gc, r);
 		}
-		
-		for(int i = 0; i < console.length; i++)
-			console[i].render(gc, r);
 	}
 	
 	public boolean isGameStarted() {
@@ -474,7 +474,7 @@ public class GameManager extends AbstractGame {
 
 	
 	private void loadEnviroment() {
-		ImageTile tempImage = (ImageTile) ImageBuffer.load(Images.enviroment);
+		ImageTile tempImage = (ImageTile) ImageBuffer.load(Images.Enviroment);
 		
 		envDeltaX = tempImage.getW()/tempImage.getTileW();
 		envDeltaY = tempImage.getH()/tempImage.getTileH();
@@ -668,7 +668,7 @@ public class GameManager extends AbstractGame {
 	}
 
 	private static void countEnviroment() {
-		ImageTile tempImage = (ImageTile) ImageBuffer.load(Images.enviroment);
+		ImageTile tempImage = (ImageTile) ImageBuffer.load(Images.Enviroment);
 		envDeltaX = tempImage.getW()/tempImage.getTileW();
 		envDeltaY = tempImage.getH()/tempImage.getTileH();
 		collisionStop = envDeltaX *envDeltaY/2;

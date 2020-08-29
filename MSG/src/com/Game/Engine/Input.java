@@ -15,7 +15,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
 	private final int NUM_KEYS = 256;
 	private boolean[] keys = new boolean[NUM_KEYS];
 	private boolean[] keysLast = new boolean[NUM_KEYS];
-	
+
 	//для мыши
 	private final int NUM_BUTTONS = 5;
 	private boolean[] buttons = new boolean[NUM_BUTTONS];

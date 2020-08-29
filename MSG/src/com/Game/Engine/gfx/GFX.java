@@ -28,10 +28,12 @@ public abstract class GFX {
 			else {
 				image = ImageIO.read(new File(GameContainer.getMainPath() + path));
 			}
+			
 			w = image.getWidth();
 			h = image.getHeight();
 			p = image.getRGB(0, 0, w, h, null, 0, w);
 			name = path;
+			
 			image.flush();
 		}catch (IllegalArgumentException | IOException e) {
 			GameContainer.addError(e);
@@ -66,6 +68,12 @@ public abstract class GFX {
 		this.p = p;
 		this.h = h;
 		this.w = w;
+	}
+
+	public void resizeIfNotFitTS() {
+		if(defaultRes[0] != GameManager.TS && defaultRes[1] != GameManager.TS) {
+			resize();
+		}
 	}
 	
 	public int getW() {
@@ -148,8 +156,8 @@ public abstract class GFX {
 	public void downgrade(double resizeW, double resizeH) {
 		int[] newArray;
 		
-		int resdH = (int) (h*resizeH), 
-				resdW = (int) (w*resizeW); 	
+		int resdH = (int) Math.floor(h*resizeH), 
+				resdW = (int) Math.floor(w*resizeW); 	
 		
 		newArray = new int[resdH*resdW];
 		
@@ -159,6 +167,7 @@ public abstract class GFX {
 		startY = h/2;
 		
 		for(int y = startY; y >= 0; y--) {
+			
 			for(int j = 0; j < resizeH; j++)
 				for(int x = startX; x >= 0; x--) {
 					for(int i = 0; i < resizeW; i++)
@@ -180,13 +189,15 @@ public abstract class GFX {
 			for(int j = 0; j < resizeH; j++)
 				for(int x = startX; x < w; x++) {
 					for(int i = 0; i < resizeW; i++)
-						newArray[(int) (x * resizeW) + i + ((int) (y * resizeH) + j) * resdW] = p[x+y*w];
+						newArray[(int) Math.floor(x * resizeW) + i + ((int) Math.floor(y * resizeH) + j) * resdW] = p[x+y*w];
 			}
 		}
 	
 		int dX = (w - resdW)/2;
 		int dY = (h - resdH)/2;
+		
 		p = new int[w*h];
+		
 		for(int y = 0; y < resdH; y++)
 			for(int x = 0; x < resdW; x++)
 				p[x + dX +(y+dY)*w] = newArray[x+y*resdW]; 

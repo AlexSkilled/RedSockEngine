@@ -109,7 +109,7 @@ public class SimpleMenuManager extends ProgrammObject {
 		/*MAIN MENU*/
 		tempMenu = new SimpleFirstMenu(Menus.MainMenu);
 		
-		tempMenu.addButton(new SimpleRelButton("WR", 0.8f, 0.8f, 4, 2) {
+		tempMenu.addButton(new SimpleRelButton("WR", 0.7f, 0.8f, 4, 2) {
 			 
 			@Override
 			public void act(GameManager gm, GameContainer gc, SimpleMenuManager menuManager) {
@@ -168,7 +168,6 @@ public class SimpleMenuManager extends ProgrammObject {
 		tempMenu = new SimpleSecondMenu(Menus.Settings) {
 				
 			public void refresh() {
-				super.refresh();
 				SimpleButton back = paragraphs.get(paragraphs.size() - 1);
 				paragraphs.clear();
 				
@@ -269,6 +268,8 @@ public class SimpleMenuManager extends ProgrammObject {
 				
 				addButton(compBtn);
 				addButton(back);
+
+				super.refresh();
 			}
 		};
 		
@@ -279,7 +280,6 @@ public class SimpleMenuManager extends ProgrammObject {
 			
 			@Override
 			public void refresh() {
-				super.refresh();
 				SimpleButton back = paragraphs.get(paragraphs.size() - 1);
 				paragraphs.clear();
 				
@@ -321,6 +321,7 @@ public class SimpleMenuManager extends ProgrammObject {
 		        }
 		        
 				addButton(back);
+				super.refresh();
 			}
 		};
 		
@@ -334,8 +335,6 @@ public class SimpleMenuManager extends ProgrammObject {
 			
 			@Override
 			public void refresh() {
-				
-				super.refresh();
 				SimpleButton back = paragraphs.get(0);
 				paragraphs.clear();
 
@@ -405,6 +404,7 @@ public class SimpleMenuManager extends ProgrammObject {
 		        tempButton.addSubButton(new InsertArea(0xffa2a2a2, 0xff0000ff));
 		        addButton(tempButton);
 				addButton(back);
+				super.refresh();
 		    }
 		};
 		

@@ -41,7 +41,7 @@ public abstract class Entity extends GameObject{
 		else {
 			int x = ID % GameManager.getESX();
 			int y = (ID - x - 100) / GameManager.getESX();
-			image = (Image) ((ImageTile) ImageBuffer.load(Images.enviroment)).getTileImage(x, y);
+			image = (Image) ((ImageTile) ImageBuffer.load(Images.Enviroment)).getTileImage(x, y);
 			image.downgrade(0.9, 0.9);
 		}
 	}
